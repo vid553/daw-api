@@ -11,6 +11,7 @@ import com.sebastian_daschner.siren4javaee.EntityBuilder;
 import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.person.Person;
+import web.application.development.teacher.Teacher;
 
 @Component
 public class Formatter {
@@ -22,7 +23,6 @@ public class Formatter {
 		JsonObject personEntity = Siren.createEntityBuilder()
 			    .addClass("user")
 			    .addProperty("id", user.getId())
-			    .addProperty("user_type", user.getType())
 			    .addProperty("name", user.getName())
 			    .addProperty("email", user.getEmail())
 			    .addProperty("number", user.getNumber())
@@ -33,16 +33,46 @@ public class Formatter {
 	}
 	
 	//returns Siren representation of a list of users
-	public JsonObject ReturnJSON(List<Person> users) {
-		String Uri = "http://localhost:8080/users";
-		EntityBuilder Users = Siren.createEntityBuilder();
-		Users.addClass("users");
-		
-		for (Person p : users) {
-			Users.addEntity(ReturnJSON(p));
+		public JsonObject ReturnJSON(List<Person> users, Person pers) {
+			String Uri = "http://localhost:8080/users";
+			EntityBuilder Users = Siren.createEntityBuilder();
+			Users.addClass("users");
+			
+			for (Person p : users) {
+				Users.addEntity(ReturnJSON(p));
+			}
+			
+			Users.addLink(URI.create(Uri), "self");
+			return Users.build();
 		}
 		
-		Users.addLink(URI.create(Uri), "self");
-		return Users.build();
+		public JsonObject ReturnJSON(Teacher teacher) {
+
+			String Uri = "http://localhost:8080/teachers/" + teacher.getId();
+			JsonObject personEntity = Siren.createEntityBuilder()
+				    .addClass("teacher")
+				    .addProperty("id", teacher.getId())
+				    .addProperty("name", teacher.getName())
+				    .addProperty("email", teacher.getEmail())
+				    .addProperty("number", teacher.getNumber())
+				    .addProperty("admin", teacher.getAdmin())
+				    .addLink(URI.create(Uri), "self")
+				    .build();
+			
+			return personEntity;
+		}
+	
+	//returns Siren representation of a list of teachers
+	public JsonObject ReturnJSON(List<Teacher> teachers, Teacher teach) {
+		String Uri = "http://localhost:8080/teachers";
+		EntityBuilder Teachers = Siren.createEntityBuilder();
+		Teachers.addClass("teachers");
+		
+		for (Teacher p : teachers) {
+			Teachers.addEntity(ReturnJSON(p));
+		}
+		
+		Teachers.addLink(URI.create(Uri), "self");
+		return Teachers.build(); 
 	}
 }
