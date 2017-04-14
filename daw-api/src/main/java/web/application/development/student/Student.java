@@ -8,6 +8,7 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 import org.springframework.hateoas.ResourceSupport;
 
@@ -15,6 +16,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.sebastian_daschner.siren4javaee.*;
+
+import web.application.development.team.Team;
 
 @Entity 
 public class Student{
@@ -24,7 +27,7 @@ public class Student{
 	private String name;
 	private String email;
 	private String number;
-	
+
 	public Student(String id, String name, String email, String number) {
 		super();
 		this.id = id;

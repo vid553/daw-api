@@ -12,7 +12,6 @@ import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.teacher.Teacher;
 import web.application.development.student.Student;
-import web.application.development.topic.Topic;
 
 @Component
 public class Formatter {
