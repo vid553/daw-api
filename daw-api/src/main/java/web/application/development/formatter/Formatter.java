@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.sebastian_daschner.siren4javaee.EntityBuilder;
 import com.sebastian_daschner.siren4javaee.Siren;
 
+import web.application.development.teacher.Teacher;
 import web.application.development.student.Student;
 import web.application.development.topic.Topic;
 
@@ -32,6 +33,35 @@ public class Formatter {
 		return studentEntity;
 	}
 	
+		public JsonObject ReturnJSON(Teacher teacher) {
+
+			String Uri = "http://localhost:8080/teachers/" + teacher.getId();
+			JsonObject personEntity = Siren.createEntityBuilder()
+				    .addClass("teacher")
+				    .addProperty("id", teacher.getId())
+				    .addProperty("name", teacher.getName())
+				    .addProperty("email", teacher.getEmail())
+				    .addProperty("number", teacher.getNumber())
+				    .addProperty("admin", teacher.getAdmin())
+				    .addLink(URI.create(Uri), "self")
+				    .build();
+			
+			return personEntity;
+		}
+	
+	//returns Siren representation of a list of teachers
+	public JsonObject ReturnJSON(List<Teacher> teachers, Teacher teach) {
+		String Uri = "http://localhost:8080/teachers";
+		EntityBuilder Teachers = Siren.createEntityBuilder();
+		Teachers.addClass("teachers");
+		
+		for (Teacher p : teachers) {
+			Teachers.addEntity(ReturnJSON(p));
+		}
+		
+		Teachers.addLink(URI.create(Uri), "self");
+		return Teachers.build(); 
+    
 	//returns Siren representation of a list of students, has dummy argument because of problems with erasure
 	public JsonObject ReturnJSON(List<Student> students, Student pers) {
 		String Uri = "http://localhost:8080/students";
