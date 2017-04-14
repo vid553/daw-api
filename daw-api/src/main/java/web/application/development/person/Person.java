@@ -25,7 +25,6 @@ public class Person{
 	private String name;
 	private String email;
 	private String number;
-	private String nekaj;
 	
 	public Person(String id, String user_type, String name, String email, String number) {
 		super();
