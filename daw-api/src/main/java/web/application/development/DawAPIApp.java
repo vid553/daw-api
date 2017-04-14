@@ -11,6 +11,4 @@ public class DawAPIApp {
 	public static void main(String[] args) {
 		SpringApplication.run(DawAPIApp.class, args);
 	}
-
-	//test 123
 }
