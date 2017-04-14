@@ -16,9 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import web.application.development.hello.Hello;
-import web.application.development.hello.HelloController;
-
 @RestController
 public class TopicController {
 	
