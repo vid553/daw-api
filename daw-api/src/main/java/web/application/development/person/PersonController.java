@@ -23,6 +23,7 @@ import com.sebastian_daschner.siren4javaee.Entity;
 import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
+import web.application.development.formatter.Formatter;
 import web.application.development.hello.Hello;
 import web.application.development.hello.HelloController;
 
@@ -31,10 +32,12 @@ public class PersonController {
 	
 	@Autowired //marks this as something that needs dependency injection, injects existing topicService
 	private PersonService personService;
+	@Autowired
+	private Formatter formatter;
 	
 	@RequestMapping(value="/users", method=RequestMethod.GET) //maps URL /topics to method getAllTopics
 	public ResponseEntity<Entity> getAllUsers() {
-		JsonObject object = personService.ReturnJSON(personService.getAllUsers());
+		JsonObject object = formatter.ReturnJSON(personService.getAllUsers());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
@@ -44,7 +47,7 @@ public class PersonController {
 	public HttpEntity<Entity> getUser(@PathVariable String id) {
 		Person person = personService.getUser(id);
 		
-		JsonObject object = personService.ReturnJSON(person);
+		JsonObject object = formatter.ReturnJSON(person);
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
