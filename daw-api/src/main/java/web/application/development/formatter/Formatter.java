@@ -61,6 +61,7 @@ public class Formatter {
 		
 		Teachers.addLink(URI.create(Uri), "self");
 		return Teachers.build(); 
+	}
     
 	//returns Siren representation of a list of students, has dummy argument because of problems with erasure
 	public JsonObject ReturnJSON(List<Student> students, Student pers) {
