@@ -19,6 +19,7 @@ import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.formatter.Formatter;
+import web.application.development.team.Team;
 
 @RestController
 public class PredmetController {
@@ -28,7 +29,7 @@ public class PredmetController {
 	@Autowired
 	private Formatter formatter;
 	
-	@RequestMapping(value="/predmeti", method=RequestMethod.GET) //maps URL /predmeti to method getAllPredmeti
+	@RequestMapping(value="/classes", method=RequestMethod.GET) //maps URL /predmeti to method getAllPredmeti
 	public ResponseEntity<Entity> getAllPredmeti() {
 		JsonObject object = formatter.ReturnJSON(predmetService.getAllPredmeti(), new Predmet());
 		EntityReader entityReader = Siren.createEntityReader();
@@ -36,7 +37,7 @@ public class PredmetController {
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/predmeti/{id}", method=RequestMethod.GET)
+	@RequestMapping(value="/classes/{id}", method=RequestMethod.GET)
 	public HttpEntity<Entity> getPredmet(@PathVariable String id) {
 		Predmet predmet = predmetService.getPredmet(id);
 		JsonObject object = formatter.ReturnJSON(predmet);
@@ -45,45 +46,35 @@ public class PredmetController {
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/predmeti", method=RequestMethod.POST)
+	@RequestMapping(value="/classes", method=RequestMethod.POST)
 	public void addPredmet(@RequestBody Predmet predmet) { //@RequestBody tells spring that the request pay load is going to contain a user
 		predmetService.addPredmet(predmet);
 	}
 	
-	@RequestMapping(value="/predmeti/{id}", method=RequestMethod.PUT)
+	@RequestMapping(value="/classes/{predmetId}/{teamId}", method=RequestMethod.POST)
+	public void addTeamToPredmet(@PathVariable String predmetId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
+		Predmet predmet = predmetService.getPredmet(predmetId);
+		predmet.addTeam(new Team(teamId,"",0));
+		predmetService.addTeamToPredmet(predmetId, predmet);
+	}
+	
+	@RequestMapping(value="/classes/{id}", method=RequestMethod.PUT)
 	public void updatePredmet(@RequestBody Predmet predmet, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
+		Predmet temp = predmetService.getPredmet(id);
+		List<Team> teams = temp.getTeams();
+		predmet.setTeams(teams);
 		predmetService.updatePredmet(id, predmet);
 	}
 	
-	@RequestMapping(value="/predmeti/{id}", method=RequestMethod.DELETE)
+	@RequestMapping(value="/classes/{id}", method=RequestMethod.DELETE)
 	public void deletePredmet(@PathVariable String id) {
 		predmetService.deletePredmet(id);
 	}
 	
-	/*@RequestMapping(value="/topics/{topicId}/courses", method=RequestMethod.GET) //maps URL /topics to method getAllTopics
-	public List<Course> getAllCourses(@PathVariable String topicId) {
-		return courseService.getAllCourses();
+	@RequestMapping(value="/classes/{predmetId}/{teamId}", method=RequestMethod.DELETE)
+	public void removeTeamFromPredmet(@PathVariable String predmetId, @PathVariable String teamId) {
+		Predmet temp = predmetService.getPredmet(predmetId);
+		temp.removeTeam(new Team(teamId, "", 0));
+		predmetService.removeTeamfromPredmet(predmetId, temp);
 	}
-	
-	@RequestMapping(value="/topics/{topicId}/courses/{courseId}", method=RequestMethod.GET) //{} tells spring the containing part is a variable
-	public Course getCourse(@PathVariable String courseId) { //annotation that maps {id} to String id
-		return courseService.getCourse(courseId);
-	}
-	
-	@RequestMapping(value="/topics/{topicId}/courses", method=RequestMethod.POST)
-	public void addCourse(@RequestBody Course course, @PathVariable String topicId) { //@RequestBody tells spring that the request pay load is going to contain a course
-		course.setTopic(new Topic(topicId, "","", ""));
-		courseService.addCourse(course);
-	}
-	
-	@RequestMapping(value="/topics/{topicId}/courses/{courseId}", method=RequestMethod.PUT)
-	public void updateCourse(@RequestBody Course course, @PathVariable String courseId, @PathVariable String topicId) { //@RequestBody tells spring that the request pay load is going to contain a topics
-		course.setTopic(new Topic(topicId, "","", ""));
-		courseService.updateCourse(course);
-	}
-	
-	@RequestMapping(value="/topics/{topicId}/courses/{courseId}", method=RequestMethod.DELETE)
-	public void deleteCourse(@PathVariable String courseId) {
-		courseService.deleteCourse(courseId);
-	} */
 }

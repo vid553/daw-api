@@ -35,4 +35,12 @@ public class SemesterService {
 	public void deleteSemester(String id) {
 		semesterRepository.delete(id);
 	}
+	
+	public void addPredmetToSemester(String id, Semester semester) {
+		semesterRepository.save(semester);
+	}
+	
+	public void removePredmetFromSemester(String id, Semester semester) {
+		semesterRepository.save(semester);
+	}
 }
