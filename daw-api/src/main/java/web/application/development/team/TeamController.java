@@ -2,13 +2,22 @@ package web.application.development.team;
 
 import java.util.List;
 
+import javax.json.JsonObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sebastian_daschner.siren4javaee.Entity;
+import com.sebastian_daschner.siren4javaee.EntityReader;
+import com.sebastian_daschner.siren4javaee.Siren;
+
+import web.application.development.formatter.Formatter;
 import web.application.development.student.Student;
 
 
@@ -17,15 +26,25 @@ public class TeamController {
 	
 	@Autowired //marks this as something that needs dependency injection, injects existing groupService
 	private TeamService groupService;
+	@Autowired
+	private Formatter formatter;
 	
 	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.GET) //maps URL /groups to method getAllGroups
-	public Team getGroup(@PathVariable String groupId) {
-		return groupService.getGroup(groupId);
+	public ResponseEntity<Entity> getGroup(@PathVariable String groupId) {
+		Team group = groupService.getGroup(groupId);
+		JsonObject object = formatter.ReturnJSON(group);
+		EntityReader entityReader = Siren.createEntityReader();
+		Entity entity = entityReader.read(object);
+		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		//return groupService.getGroup(groupId);
 	}
 	
 	@RequestMapping(value="/groups", method=RequestMethod.GET) //maps URL /groups to method getAllGroups
-	public List<Team> getAllGroups() {
-		return groupService.getAllGroups();
+	public ResponseEntity<Entity> getAllGroups() {
+		JsonObject object = formatter.ReturnJSON(groupService.getAllGroups(), new Team());
+		EntityReader entityReader = Siren.createEntityReader();
+		Entity entity = entityReader.read(object);
+		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/groups", method=RequestMethod.POST)
@@ -53,12 +72,12 @@ public class TeamController {
 		groupService.deleteGroup(groupId);
 	}
 	
-	//deletes student from group (NOT WORKING)
-	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.DELETE) //changes student in group
-	public void remveStudentFromGroup(@RequestBody Student student, @PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	//deletes student from group
+	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.DELETE) //removes student from group, payload requires student id
+	public void remveStudentFromGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Team temp = groupService.getGroup(groupId);
-		temp.addStudent(new Student(studentId, "","",""));
-		groupService.addStudentToGroup(groupId, temp);
+		temp.removeStudent(new Student(studentId, "","",""));
+		groupService.removeStundentFromGroup(groupId, temp);
 	}
 
 }
