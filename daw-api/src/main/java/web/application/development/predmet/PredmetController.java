@@ -1,4 +1,4 @@
-package web.application.development.course;
+package web.application.development.predmet;
 
 import java.util.List;
 
@@ -21,43 +21,43 @@ import com.sebastian_daschner.siren4javaee.Siren;
 import web.application.development.formatter.Formatter;
 
 @RestController
-public class CourseController {
+public class PredmetController {
 	
 	@Autowired //marks this as something that needs dependency injection, injects existing topicService
-	private CourseService courseService;
+	private PredmetService predmetService;
 	@Autowired
 	private Formatter formatter;
 	
-	@RequestMapping(value="/courses", method=RequestMethod.GET) //maps URL /courses to method getAllCourses
-	public ResponseEntity<Entity> getAllCourses() {
-		JsonObject object = formatter.ReturnJSON(courseService.getAllCourses(), new Course());
+	@RequestMapping(value="/predmeti", method=RequestMethod.GET) //maps URL /predmeti to method getAllPredmeti
+	public ResponseEntity<Entity> getAllPredmeti() {
+		JsonObject object = formatter.ReturnJSON(predmetService.getAllPredmeti(), new Predmet());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/courses/{id}", method=RequestMethod.GET)
-	public HttpEntity<Entity> getCourse(@PathVariable String id) {
-		Course course = courseService.getCourse(id);
-		JsonObject object = formatter.ReturnJSON(course);
+	@RequestMapping(value="/predmeti/{id}", method=RequestMethod.GET)
+	public HttpEntity<Entity> getPredmet(@PathVariable String id) {
+		Predmet predmet = predmetService.getPredmet(id);
+		JsonObject object = formatter.ReturnJSON(predmet);
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/courses", method=RequestMethod.POST)
-	public void addCourse(@RequestBody Course course) { //@RequestBody tells spring that the request pay load is going to contain a user
-		courseService.addCourse(course);
+	@RequestMapping(value="/predmeti", method=RequestMethod.POST)
+	public void addPredmet(@RequestBody Predmet predmet) { //@RequestBody tells spring that the request pay load is going to contain a user
+		predmetService.addPredmet(predmet);
 	}
 	
-	@RequestMapping(value="/courses/{id}", method=RequestMethod.PUT)
-	public void updateCourse(@RequestBody Course course, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
-		courseService.updateCourse(id, course);
+	@RequestMapping(value="/predmeti/{id}", method=RequestMethod.PUT)
+	public void updatePredmet(@RequestBody Predmet predmet, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
+		predmetService.updatePredmet(id, predmet);
 	}
 	
-	@RequestMapping(value="/courses/{id}", method=RequestMethod.DELETE)
-	public void deleteCourse(@PathVariable String id) {
-		courseService.deleteCourse(id);
+	@RequestMapping(value="/predmeti/{id}", method=RequestMethod.DELETE)
+	public void deletePredmet(@PathVariable String id) {
+		predmetService.deletePredmet(id);
 	}
 	
 	/*@RequestMapping(value="/topics/{topicId}/courses", method=RequestMethod.GET) //maps URL /topics to method getAllTopics

@@ -28,23 +28,22 @@ import web.application.development.formatter.Formatter;
 @RestController
 public class StudentController {
 	
-	@Autowired //marks this as something that needs dependency injection, injects existing topicService
-	private StudentService personService;
+	@Autowired //marks this as something that needs dependency injection, injects existing studentService
+	private StudentService studentService;
 	@Autowired
 	private Formatter formatter;
 	
-	@RequestMapping(value="/students", method=RequestMethod.GET) //maps URL /topics to method getAllTopics
-	public ResponseEntity<Entity> getAllUsers() {
-		JsonObject object = formatter.ReturnJSON(personService.getAllStudents(), new Student());
+	@RequestMapping(value="/students", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	public ResponseEntity<Entity> getAllStudents() {
+		JsonObject object = formatter.ReturnJSON(studentService.getAllStudents(), new Student());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/students/{id}", method=RequestMethod.GET)
-	public HttpEntity<Entity> getUser(@PathVariable String id) {
-		Student student = personService.getStudent(id);
-		
+	public HttpEntity<Entity> getStudent(@PathVariable String id) {
+		Student student = studentService.getStudent(id);
 		JsonObject object = formatter.ReturnJSON(student);
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
@@ -52,18 +51,18 @@ public class StudentController {
 	}
 	
 	@RequestMapping(value="/students", method=RequestMethod.POST)
-	public void addUser(@RequestBody Student student) { //@RequestBody tells spring that the request pay load is going to contain a user
-		personService.addStudent(student);
+	public void addStudent(@RequestBody Student student) { //@RequestBody tells spring that the request pay load is going to contain a user
+		studentService.addStudent(student);
 	}
 	
 	@RequestMapping(value="/students/{id}", method=RequestMethod.PUT)
-	public void updateUser(@RequestBody Student student, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
-		personService.updateStudent(id, student);
+	public void updateStudent(@RequestBody Student student, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
+		studentService.updateStudent(id, student);
 	}
 	
 	@RequestMapping(value="/students/{id}", method=RequestMethod.DELETE)
-	public void deleteUser(@PathVariable String id) {
-		personService.deleteStudent(id);
+	public void deleteStudent(@PathVariable String id) {
+		studentService.deleteStudent(id);
 	}
 
 }
