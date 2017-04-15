@@ -1,6 +1,7 @@
 package web.application.development.teacher;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.json.Json;
@@ -8,6 +9,7 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import org.springframework.hateoas.ResourceSupport;
 
@@ -15,6 +17,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.sebastian_daschner.siren4javaee.*;
+
+import web.application.development.course.Course;
+import web.application.development.predmet.Predmet;
+import web.application.development.student.Student;
 
 @Entity 
 public class Teacher{
@@ -26,6 +32,9 @@ public class Teacher{
 	private String number;
 	private Boolean admin;
 	
+	@OneToMany
+	private List<Course> courses;
+
 	public Teacher(String id, String name, String email, String number, Boolean admin) {
 		super();
 		this.id = id;
@@ -33,6 +42,7 @@ public class Teacher{
 		this.email = email;
 		this.number = number;
 		this.admin = admin;
+		courses = new ArrayList<Course>();
 	}
 	
 	public Teacher() {
@@ -76,5 +86,30 @@ public class Teacher{
 	
 	public Boolean getAdmin() {
 		return admin;
+	}
+	public List<Course> getCourses() {
+		return courses;
+	}
+
+	public void setCourses(List<Course> courses) {
+		this.courses = courses;
+	}
+
+	public void setAdmin(Boolean admin) {
+		this.admin = admin;
+	}
+	
+	public void addCourse(Course course) {
+		this.courses.add(course);
+	}
+	
+	public void removeCourse(Course course) {
+		List<Student> students = new ArrayList<Student>();
+		for(Course c : this.courses){
+		    if(c.getId().equals(course.getId())) {
+		    	courses.add(c);
+		    }
+		}
+		this.courses.removeAll(students);
 	}
 }

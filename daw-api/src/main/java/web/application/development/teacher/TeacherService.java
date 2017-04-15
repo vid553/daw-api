@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import com.sebastian_daschner.siren4javaee.EntityBuilder;
 import com.sebastian_daschner.siren4javaee.Siren;
 
+import web.application.development.team.Team;
+
 @Service
 public class TeacherService {
 	
@@ -40,6 +42,14 @@ public class TeacherService {
 
 	public void deleteTeacher(String id) {
 		teacherRepository.delete(id);
+	}
+	
+	public void addCourseToTeacher(String id, Teacher teacher) {
+		teacherRepository.save(teacher);
+	}
+	
+	public void removeCourseFromTeacher(String id, Teacher teacher) {
+		teacherRepository.save(teacher);
 	}
 	
 }
