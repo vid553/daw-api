@@ -16,7 +16,7 @@ import com.sebastian_daschner.siren4javaee.Siren;
 @Service
 public class StudentService {
 	
-	@Autowired //injects instance of TopicRepository
+	@Autowired //injects instance of studentRepository
 	private StundetRepository studentRepository;
 
 	public List<Student> getAllStudents() {

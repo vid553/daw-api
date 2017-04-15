@@ -13,9 +13,9 @@ public class CourseService {
 	@Autowired //injects instance of TopicRepository
 	private CourseRepository courseRepository;
 
-	public List<Course> getAllCourses(String topicId) {
+	public List<Course> getAllCourses() {
 		List<Course> courses = new ArrayList<>();
-		courseRepository.findByTopicId(topicId).forEach(courses::add);
+		courseRepository.findAll().forEach(courses::add);
 		return courses;
 	}
 	
@@ -28,7 +28,7 @@ public class CourseService {
 		courseRepository.save(course);
 	}
 	
-	public void updateCourse(Course course) {
+	public void updateCourse(String id, Course course) {
 		courseRepository.save(course);
 	}
 

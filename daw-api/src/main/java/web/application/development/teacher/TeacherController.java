@@ -33,8 +33,8 @@ public class TeacherController {
 	@Autowired
 	private Formatter formatter;
 	
-	@RequestMapping(value="/teachers", method=RequestMethod.GET) //maps URL /topics to method getAllTopics
-	public ResponseEntity<Entity> getAllUsers() {
+	@RequestMapping(value="/teachers", method=RequestMethod.GET) //maps URL /teachers to method getAllTeachers
+	public ResponseEntity<Entity> getAllTeachers() {
 		JsonObject object = formatter.ReturnJSON(teacherService.getAllTeachers(), new Teacher());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
@@ -44,7 +44,6 @@ public class TeacherController {
 	@RequestMapping(value="/teachers/{id}", method=RequestMethod.GET)
 	public HttpEntity<Entity> getTeacher(@PathVariable String id) {
 		Teacher teacher = teacherService.getTeacher(id);
-		
 		JsonObject object = formatter.ReturnJSON(teacher);
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
