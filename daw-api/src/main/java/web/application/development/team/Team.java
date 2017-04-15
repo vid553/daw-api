@@ -1,6 +1,7 @@
 package web.application.development.team;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -76,7 +77,13 @@ public class Team{
 	}
 	
 	public void removeStudent(Student student) {
-		this.students.remove(student);
+		List<Student> students = new ArrayList<Student>();
+		for(Student s : this.students){
+		    if(s.equals(student)) {
+		    	students.add(s);
+		    }
+		}
+		this.students.removeAll(students);
 	}
 
 }
