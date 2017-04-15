@@ -62,29 +62,7 @@ public class Formatter {
 			
 		return teacherEntity.build();
 	}
-	
-	
-	public JsonObject ReturnJSON(Team team) {
 
-		String Uri = "http://localhost:8080/groups/" + team.getId();
-		EntityBuilder teamEntity = Siren.createEntityBuilder()
-			    .addClass("group")
-			    .addProperty("id", team.getId())
-			    .addProperty("name", team.getName())
-			    .addProperty("students_limit", team.getStudents_limit());
-			    
-				List<Student> students = team.getStudents();
-		
-				for (Student s : students) {
-					teamEntity.addEntity(ReturnJSON(s));
-				}
-		
-			    teamEntity.addLink(URI.create(Uri), "self");
-			    //.build();
-		
-		return teamEntity.build();
-	}
-	
 	public JsonObject ReturnJSON(Team team) {
 
 		String Uri = "http://localhost:8080/groups/" + team.getId();
