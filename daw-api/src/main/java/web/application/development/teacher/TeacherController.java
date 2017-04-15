@@ -79,9 +79,10 @@ public class TeacherController {
 	}
 	
 	@RequestMapping(value="/teachers/{teacherId}/{courseId}", method=RequestMethod.DELETE) //removes course from teacher, body has to have course ID
-	public void remveStudentFromGroup(@RequestBody Course course, @PathVariable String courseId, @PathVariable String teacherId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	public void remveStudentFromGroup(@PathVariable String courseId, @PathVariable String teacherId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Teacher temp = teacherService.getTeacher(teacherId);
-		temp.removeCourse(course);
+		//Course course = new Course(courseId, "","");
+		temp.removeCourse(new Course(courseId, "",""));
 		teacherService.removeCourseFromTeacher(teacherId, temp);
 	}
 
