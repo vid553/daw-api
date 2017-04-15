@@ -57,8 +57,8 @@ public class TeamController {
 	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.DELETE) //changes student in group
 	public void remveStudentFromGroup(@RequestBody Student student, @PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Team temp = groupService.getGroup(groupId);
-		temp.addStudent(new Student(studentId, "","",""));
-		groupService.addStudentToGroup(groupId, temp);
+		temp.removeStudent(student);
+		groupService.removeStundentFromGroup(groupId, temp);
 	}
 
 }

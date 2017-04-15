@@ -11,6 +11,7 @@ import com.sebastian_daschner.siren4javaee.EntityBuilder;
 import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.teacher.Teacher;
+import web.application.development.team.Team;
 import web.application.development.student.Student;
 
 import web.application.development.course.Course;
@@ -53,6 +54,27 @@ public class Formatter {
 			
 		return personEntity;
 	}
+	
+	public JsonObject ReturnJSON(Team team) {
+
+		String Uri = "http://localhost:8080/groups/" + team.getId();
+		EntityBuilder teamEntity = Siren.createEntityBuilder()
+			    .addClass("group")
+			    .addProperty("id", team.getId())
+			    .addProperty("name", team.getName())
+			    .addProperty("students_limit", team.getStudents_limit());
+			    
+				List<Student> students = team.getStudents();
+		
+				for (Student s : students) {
+					teamEntity.addEntity(ReturnJSON(s));
+				}
+		
+			    teamEntity.addLink(URI.create(Uri), "self");
+			    //.build();
+		
+		return teamEntity.build();
+	}
 		
 	//returns Siren representation of Course
 	public JsonObject ReturnJSON(Course course) {
@@ -73,31 +95,40 @@ public class Formatter {
 	public JsonObject ReturnJSON(Semester semester) {
 
 		String Uri = "http://localhost:8080/semesters/" + semester.getId();
-		JsonObject semesterEntity = Siren.createEntityBuilder()
+		EntityBuilder semesterEntity = Siren.createEntityBuilder()
 			    .addClass("semester")
 			    .addProperty("id", semester.getId())
 			    .addProperty("name", semester.getName())
 			    .addProperty("season", semester.getSeason())
-			    .addProperty("leto", semester.getLeto())
-			    .addLink(URI.create(Uri), "self")
-			    .build();
+			    .addProperty("leto", semester.getLeto());
+			    
+		List<Predmet> predmeti = semester.getPredmeti();
+		for (Predmet p : predmeti) {
+			semesterEntity.addEntity(ReturnJSON(p));
+		}
+		semesterEntity.addLink(URI.create(Uri), "self");
 		
-		return semesterEntity;
+		return semesterEntity.build();
 	}
 	
 	//returns Siren representation of class
 	public JsonObject ReturnJSON(Predmet predmet) {
 
-		String Uri = "http://localhost:8080/predmeti/" + predmet.getId();
-		JsonObject semesterEntity = Siren.createEntityBuilder()
-			    .addClass("predmet")
+		String Uri = "http://localhost:8080/classes/" + predmet.getId();
+		EntityBuilder predmetEntity = Siren.createEntityBuilder()
+			    .addClass("class")
 			    .addProperty("id", predmet.getId())
 			    .addProperty("identifier", predmet.getIdentifier())
-			     .addProperty("enrolment_auto", predmet.getEnrolment())
-			    .addLink(URI.create(Uri), "self")
-			    .build();
+			    .addProperty("enrolment_auto", predmet.getEnrolment());
 		
-		return semesterEntity;
+		List<Team> teams = predmet.getTeams();
+		for (Team t : teams) {
+			predmetEntity.addEntity(ReturnJSON(t));
+		}
+			    
+	    predmetEntity.addLink(URI.create(Uri), "self");
+		
+		return predmetEntity.build();
 	}
 				
 	//returns Siren representation of a list of teachers
@@ -158,9 +189,9 @@ public class Formatter {
 	
 	//returns Siren representation of a list of classes, has dummy argument because of problems with erasure
 		public JsonObject ReturnJSON(List<Predmet> predmeti, Predmet pre) {
-			String Uri = "http://localhost:8080/predmeti";
+			String Uri = "http://localhost:8080/classes";
 			EntityBuilder Predmeti = Siren.createEntityBuilder();
-			Predmeti.addClass("predmeti");
+			Predmeti.addClass("classes");
 			
 			for (Predmet p : predmeti) {
 				Predmeti.addEntity(ReturnJSON(p));
@@ -169,4 +200,17 @@ public class Formatter {
 			Predmeti.addLink(URI.create(Uri), "self");
 			return Predmeti.build();
 		}
+		
+		public JsonObject ReturnJSON(List<Team> groups, Team team) {
+			String Uri = "http://localhost:8080/groups";
+			EntityBuilder Groups = Siren.createEntityBuilder();
+			Groups.addClass("groups");
+			
+			for (Team p : groups) {
+				Groups.addEntity(ReturnJSON(p));
+			}
+			
+			Groups.addLink(URI.create(Uri), "self");
+			return Groups.build();
+	}
 }
