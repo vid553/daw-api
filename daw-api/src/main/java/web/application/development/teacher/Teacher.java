@@ -104,12 +104,12 @@ public class Teacher{
 	}
 	
 	public void removeCourse(Course course) {
-		List<Student> students = new ArrayList<Student>();
+		List<Course> courses = new ArrayList<Course>();
 		for(Course c : this.courses){
 		    if(c.getId().equals(course.getId())) {
 		    	courses.add(c);
 		    }
 		}
-		this.courses.removeAll(students);
+		this.courses.removeAll(courses);
 	}
 }
