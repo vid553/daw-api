@@ -15,7 +15,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import web.application.development.student.Student;
-import web.application.development.topic.Topic;
 
 @Entity 
 public class Team{

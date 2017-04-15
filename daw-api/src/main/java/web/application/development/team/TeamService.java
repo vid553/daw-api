@@ -15,8 +15,6 @@ import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.course.Course;
 import web.application.development.student.Student;
-import web.application.development.topic.Topic;
-
 @Service
 public class TeamService {
 	
