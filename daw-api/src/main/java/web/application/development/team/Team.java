@@ -78,11 +78,10 @@ public class Team{
 	public void removeStudent(Student student) {
 		List<Student> students = new ArrayList<Student>();
 		for(Student s : this.students){
-		    if(s.equals(student)) {
+		    if(s.getId().equals(student.getId())) {
 		    	students.add(s);
 		    }
 		}
 		this.students.removeAll(students);
 	}
-
 }

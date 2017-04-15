@@ -10,11 +10,6 @@ import javax.json.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.sebastian_daschner.siren4javaee.EntityBuilder;
-import com.sebastian_daschner.siren4javaee.Siren;
-
-import web.application.development.course.Course;
-import web.application.development.student.Student;
 @Service
 public class TeamService {
 	
