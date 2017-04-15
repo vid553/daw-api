@@ -4,25 +4,20 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import web.application.development.topic.Topic;
-
 @Entity 
 public class Course {
 
 	@Id	//primary key
 	private String id;
 	private String name;
-	private String description;
+	private String acronim;
 	
-	@ManyToOne
-	private Topic topic;
 
-	public Course(String id, String name, String description, String topicId) {
+	public Course(String id, String name, String acronim) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.description = description;
-		this.topic = new Topic(topicId, "","", "");
+		this.acronim = acronim;
 	}
 	
 	public Course() {
@@ -44,20 +39,12 @@ public class Course {
 		this.name = name;
 	}
 	
-	public String getDescription() {
-		return description;
+	public String getAcronim() {
+		return acronim;
 	}
 	
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	
-	public Topic getTopic() {
-		return topic;
-	}
-
-	public void setTopic(Topic topic) {
-		this.topic = topic;
+	public void setAcronim(String acronim) {
+		this.acronim = acronim;
 	}
 
 }
