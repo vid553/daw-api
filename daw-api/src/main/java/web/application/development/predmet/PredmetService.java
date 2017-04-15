@@ -35,4 +35,12 @@ public class PredmetService {
 	public void deletePredmet(String id) {
 		predmetRepository.delete(id);
 	}
+	
+	public void addTeamToPredmet(String id, Predmet predmet) {
+		predmetRepository.save(predmet);
+	}
+	
+	public void removeTeamfromPredmet(String id, Predmet predmet) {
+		predmetRepository.save(predmet);
+	}
 }
