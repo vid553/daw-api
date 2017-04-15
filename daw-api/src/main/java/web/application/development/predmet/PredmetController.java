@@ -50,6 +50,13 @@ public class PredmetController {
 	public void addPredmet(@RequestBody Predmet predmet) { //@RequestBody tells spring that the request pay load is going to contain a user
 		predmetService.addPredmet(predmet);
 	}
+	/*example of pay load
+	 * {
+		"id": "java_class",
+		"identifier": "J",
+		"enrolment": "true"
+		}
+	 */
 	
 	@RequestMapping(value="/classes/{predmetId}/{teamId}", method=RequestMethod.POST)
 	public void addTeamToPredmet(@PathVariable String predmetId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
