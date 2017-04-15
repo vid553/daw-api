@@ -12,9 +12,11 @@ import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.teacher.Teacher;
 import web.application.development.student.Student;
+
 import web.application.development.course.Course;
 import web.application.development.semester.Semester;
 import web.application.development.predmet.Predmet;
+
 
 @Component
 public class Formatter {
