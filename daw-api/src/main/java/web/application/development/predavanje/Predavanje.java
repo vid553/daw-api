@@ -117,14 +117,11 @@ public class Predavanje {
 	}
 	
 	@PreRemove
-	private void removeStudentFromPredavanje() {
+	private void removePredavanje() {
 	    for (Student s : this.students) {
 	        s.getClasses().remove(this);
 	    }
-	}
-	
-	@PreRemove
-	private void removeTeacherFromPredavanje() {
+	    
 	    for (Teacher t : this.teachers) {
 	        t.getPredavanje().remove(this);
 	    }
