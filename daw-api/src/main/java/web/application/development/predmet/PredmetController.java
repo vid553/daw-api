@@ -19,6 +19,7 @@ import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.formatter.Formatter;
+import web.application.development.student.Student;
 import web.application.development.team.Team;
 
 @RestController

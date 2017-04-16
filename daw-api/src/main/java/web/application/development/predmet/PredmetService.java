@@ -7,6 +7,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import web.application.development.student.Student;
+
 @Service
 public class PredmetService {
 	
@@ -41,6 +43,14 @@ public class PredmetService {
 	}
 	
 	public void removeTeamfromPredmet(String id, Predmet predmet) {
+		predmetRepository.save(predmet);
+	}
+	
+	public void enrollStudentIntoClass(String id, Predmet predmet) {
+		predmetRepository.save(predmet);
+	}
+	
+	public void assignTeacherToClass(String id, Predmet predmet) {
 		predmetRepository.save(predmet);
 	}
 }

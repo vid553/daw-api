@@ -7,6 +7,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import web.application.development.predmet.Predmet;
+import web.application.development.teacher.Teacher;
+
 @Service
 public class CourseService {
 	
@@ -34,5 +37,13 @@ public class CourseService {
 
 	public void deleteCourse(String id) {
 		courseRepository.delete(id);
+	}
+	
+	public void addClassToCourse(String id, Course course) {
+		courseRepository.save(course);
+	}
+	
+	public void removeClassFromCourse(String id, Course course) {
+		courseRepository.save(course);
 	}
 }
