@@ -26,20 +26,79 @@ public class Formatter {
 	public JsonObject ReturnJSON(Student student) {
 
 		String Uri = "http://localhost:8080/students/" + student.getId();
-		JsonObject studentEntity = Siren.createEntityBuilder()
+		EntityBuilder studentEntity = Siren.createEntityBuilder()
 			    .addClass("student")
 			    .addProperty("id", student.getId())
 			    .addProperty("name", student.getName())
 			    .addProperty("email", student.getEmail())
-			    .addProperty("number", student.getNumber())
-			    .addLink(URI.create(Uri), "self")
-			    .build();
+			    .addProperty("number", student.getNumber());
 		
-		return studentEntity;
+		List<Predmet> predmeti = student.getClasses();
+		
+		for (Predmet p : predmeti) {
+			studentEntity.addEntity(ReturnJSON(p));
+		}
+		
+			    studentEntity.addLink(URI.create(Uri), "self");
+
+		return studentEntity.build();
+	}
+	
+	//returns Siren representation of Student
+	public JsonObject ReturnJSON(Student student, Predmet predmet) {
+
+		String Uri = "http://localhost:8080/students/" + student.getId();
+		EntityBuilder studentEntity = Siren.createEntityBuilder()
+			    .addClass("student")
+			    .addProperty("id", student.getId())
+			    .addProperty("name", student.getName())
+			    .addProperty("email", student.getEmail())
+			    .addProperty("number", student.getNumber());
+		/*
+		List<Predmet> predmeti = student.getClasses();
+		
+		for (Predmet p : predmeti) {
+			studentEntity.addEntity(ReturnJSON(p));
+		}
+		*/
+			    studentEntity.addLink(URI.create(Uri), "self");
+
+		return studentEntity.build();
 	}
 	
 	//returns Siren representation of Teacher
 	public JsonObject ReturnJSON(Teacher teacher) {
+
+		String Uri = "http://localhost:8080/teachers/" + teacher.getId();
+		EntityBuilder teacherEntity = Siren.createEntityBuilder()
+			    .addClass("teacher")
+			    .addProperty("id", teacher.getId())
+			    .addProperty("name", teacher.getName())
+			    .addProperty("email", teacher.getEmail())
+			    .addProperty("number", teacher.getNumber())
+			    .addProperty("admin", teacher.getAdmin());
+		
+				List<Course> courses = teacher.getCourses();
+				
+				for (Course c : courses) {
+					teacherEntity.addEntity(ReturnJSON(c));
+				}
+				
+				List<Predmet> predmets = teacher.getPredmeti();
+				
+				for (Predmet p : predmets) {
+					teacherEntity.addEntity(ReturnJSON(p));
+				}
+				
+				teacherEntity.addLink(URI.create(Uri), "self");
+			    //.addLink(URI.create(Uri), "self")
+			    //.build();
+			
+		return teacherEntity.build();
+	}
+
+	//returns Siren representation of Teacher
+	public JsonObject ReturnJSON(Teacher teacher, Predmet p) {
 
 		String Uri = "http://localhost:8080/teachers/" + teacher.getId();
 		EntityBuilder teacherEntity = Siren.createEntityBuilder()
@@ -62,7 +121,7 @@ public class Formatter {
 			
 		return teacherEntity.build();
 	}
-
+	
 	public JsonObject ReturnJSON(Team team) {
 
 		String Uri = "http://localhost:8080/groups/" + team.getId();
@@ -133,7 +192,19 @@ public class Formatter {
 		for (Team t : teams) {
 			predmetEntity.addEntity(ReturnJSON(t));
 		}
-			    
+		
+		List<Student> students = predmet.getStudents();
+		
+		for (Student s : students) {
+			predmetEntity.addEntity(ReturnJSON(s, new Predmet()));
+		}
+		
+		List<Teacher> teachers = predmet.getTeachers();
+		
+		for (Teacher t : teachers) {
+			predmetEntity.addEntity(ReturnJSON(t, new Predmet()));
+		}
+		
 	    predmetEntity.addLink(URI.create(Uri), "self");
 		
 		return predmetEntity.build();

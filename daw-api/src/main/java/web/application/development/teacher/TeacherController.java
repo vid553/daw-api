@@ -25,6 +25,8 @@ import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.course.Course;
 import web.application.development.formatter.Formatter;
+import web.application.development.predmet.Predmet;
+import web.application.development.predmet.PredmetService;
 import web.application.development.student.Student;
 import web.application.development.team.Team;
 
@@ -33,6 +35,8 @@ public class TeacherController {
 	
 	@Autowired //marks this as something that needs dependency injection, injects existing topicService
 	private TeacherService teacherService;
+	@Autowired 
+	private PredmetService predmetService;
 	@Autowired
 	private Formatter formatter;
 	
@@ -84,6 +88,17 @@ public class TeacherController {
 		//Course course = new Course(courseId, "","");
 		temp.removeCourse(new Course(courseId, "",""));
 		teacherService.removeCourseFromTeacher(teacherId, temp);
+	}
+	
+	@RequestMapping(value="/teachers/{teacherId}/classes/{classId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
+	public void assignTeacherToClass(@PathVariable String teacherId, @PathVariable String classId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+		Teacher teacher = teacherService.getTeacher(teacherId);
+		teacher.assignTeacherToClass(new Predmet(classId, "",false));
+		teacherService.assignTeacherToClass(teacherId, teacher);
+		
+		Predmet predmet = predmetService.getPredmet(classId);
+		predmet.assignTeacherToClass(new Teacher(teacherId, "", "", "", false));
+		predmetService.assignTeacherToClass(classId, predmet);
 	}
 
 }

@@ -9,6 +9,7 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import org.springframework.hateoas.ResourceSupport;
@@ -34,6 +35,9 @@ public class Teacher{
 	
 	@OneToMany
 	private List<Course> courses;
+
+	@ManyToMany(targetEntity = Predmet.class)
+	private List<Predmet> predmeti;
 
 	public Teacher(String id, String name, String email, String number, Boolean admin) {
 		super();
@@ -111,5 +115,19 @@ public class Teacher{
 		    }
 		}
 		this.courses.removeAll(courses);
+	}
+	
+	public void assignTeacherToClass(Predmet predmet) {
+		if (!this.predmeti.contains(predmet)) {
+			this.predmeti.add(predmet);
+		}
+	}
+
+	public List<Predmet> getPredmeti() {
+		return predmeti;
+	}
+
+	public void setPredmeti(List<Predmet> predmeti) {
+		this.predmeti = predmeti;
 	}
 }
