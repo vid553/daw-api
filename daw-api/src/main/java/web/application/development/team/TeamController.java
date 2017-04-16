@@ -29,6 +29,7 @@ public class TeamController {
 	@Autowired
 	private Formatter formatter;
 	
+	//works if team exists, TODO: handle non-existing team, returns 500, should return 404
 	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.GET) //maps URL /groups to method getAllGroups
 	public ResponseEntity<Entity> getGroup(@PathVariable String groupId) {
 		Team group = groupService.getGroup(groupId);
@@ -39,6 +40,7 @@ public class TeamController {
 		//return groupService.getGroup(groupId);
 	}
 	
+	//works
 	@RequestMapping(value="/groups", method=RequestMethod.GET) //maps URL /groups to method getAllGroups
 	public ResponseEntity<Entity> getAllGroups() {
 		JsonObject object = formatter.ReturnJSON(groupService.getAllGroups(), new Team());
@@ -47,18 +49,13 @@ public class TeamController {
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
+	//works
 	@RequestMapping(value="/groups", method=RequestMethod.POST)
 	public void addGroup(@RequestBody Team group) { //@RequestBody tells spring that the request pay load is going to contain a course
 		groupService.addGroup(group);
 	}
-	
-	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
-	public void addStudentToGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
-		Team group = groupService.getGroup(groupId);
-		group.addStudent(new Student(studentId, "","",""));
-		groupService.addStudentToGroup(groupId, group);
-	}
 
+	//works
 	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.PUT) //change group info
 	public void updateGroup(@RequestBody Team group, @PathVariable String groupId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Team temp = groupService.getGroup(groupId);
@@ -67,13 +64,22 @@ public class TeamController {
 		groupService.updateGroup(groupId, group);
 	}
 	
+	//works
 	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.DELETE) //delete group
 	public void deleteGroup(@PathVariable String groupId) {
 		groupService.deleteGroup(groupId);
 	}
 	
-	//deletes student from group
-	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.DELETE) //removes student from group, payload requires student id
+	//works
+	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
+	public void addStudentToGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+		Team group = groupService.getGroup(groupId);
+		group.addStudent(new Student(studentId, "","",""));
+		groupService.addStudentToGroup(groupId, group);
+	}
+
+	//works
+	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.DELETE) //removes student from group
 	public void remveStudentFromGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Team temp = groupService.getGroup(groupId);
 		temp.removeStudent(new Student(studentId, "","",""));

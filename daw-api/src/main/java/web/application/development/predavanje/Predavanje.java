@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.PreRemove;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,6 +114,20 @@ public class Predavanje {
 		if (!this.students.contains(student)) {
 			this.students.add(student);
 		}
+	}
+	
+	@PreRemove
+	private void removeStudentFromPredavanje() {
+	    for (Student s : this.students) {
+	        s.getClasses().remove(this);
+	    }
+	}
+	
+	@PreRemove
+	private void removeTeacherFromPredavanje() {
+	    for (Teacher t : this.teachers) {
+	        t.getPredavanje().remove(this);
+	    }
 	}
 	
 }
