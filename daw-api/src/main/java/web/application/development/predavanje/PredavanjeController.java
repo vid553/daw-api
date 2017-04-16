@@ -29,6 +29,7 @@ public class PredavanjeController {
 	@Autowired
 	private Formatter formatter;
 	
+	//works
 	@RequestMapping(value="/classes", method=RequestMethod.GET) //maps URL /predmeti to method getAllPredmeti
 	public ResponseEntity<Entity> getAllPredmeti() {
 		JsonObject object = formatter.ReturnJSON(predavanjeService.getAllPredavanje(), new Predavanje());
@@ -37,6 +38,7 @@ public class PredavanjeController {
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
+	//works if class exists, TODO: handle non-existing class, returns 500, should return 404
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.GET)
 	public HttpEntity<Entity> getPredavanje(@PathVariable String id) {
 		Predavanje predmet = predavanjeService.getPredavanje(id);
@@ -46,6 +48,7 @@ public class PredavanjeController {
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
+	//doesnt work if uri contains special characters
 	@RequestMapping(value="/classes", method=RequestMethod.POST)
 	public void addPredavanje(@RequestBody Predavanje predmet) { //@RequestBody tells spring that the request pay load is going to contain a user
 		predavanjeService.addPredavanje(predmet);
@@ -58,13 +61,7 @@ public class PredavanjeController {
 		}
 	 */
 	
-	@RequestMapping(value="/classes/{predmetId}/{teamId}", method=RequestMethod.POST)
-	public void addTeamToPredavanje(@PathVariable String predmetId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
-		Predavanje predmet = predavanjeService.getPredavanje(predmetId);
-		predmet.addTeam(new Team(teamId,"",0));
-		predavanjeService.addTeamToPredavanje(predmetId, predmet);
-	}
-	
+	//works
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.PUT)
 	public void updatePredavanje(@RequestBody Predavanje predmet, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Predavanje temp = predavanjeService.getPredavanje(id);
@@ -73,15 +70,25 @@ public class PredavanjeController {
 		predavanjeService.updatePredavanje(id, predmet);
 	}
 	
+	//works
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.DELETE)
 	public void deletePredmet(@PathVariable String id) {
 		predavanjeService.deletePredavanje(id);
 	}
 	
-	@RequestMapping(value="/classes/{predmetId}/{teamId}", method=RequestMethod.DELETE)
-	public void removeTeamFromPredmet(@PathVariable String predmetId, @PathVariable String teamId) {
-		Predavanje temp = predavanjeService.getPredavanje(predmetId);
+	//works
+	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.POST)
+	public void addTeamToPredavanje(@PathVariable String predavanjeId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
+		Predavanje predmet = predavanjeService.getPredavanje(predavanjeId);
+		predmet.addTeam(new Team(teamId,"",0));
+		predavanjeService.addTeamToPredavanje(predavanjeId, predmet);
+	}
+	
+	//works
+	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.DELETE)
+	public void removeTeamFromPredmet(@PathVariable String predavanjeId, @PathVariable String teamId) {
+		Predavanje temp = predavanjeService.getPredavanje(predavanjeId);
 		temp.removeTeam(new Team(teamId, "", 0));
-		predavanjeService.removeTeamfromPredavanje(predmetId, temp);
+		predavanjeService.removeTeamfromPredavanje(predavanjeId, temp);
 	}
 }
