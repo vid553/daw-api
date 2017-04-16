@@ -1,12 +1,9 @@
-package web.application.development.predmet;
+package web.application.development.predavanje;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +13,12 @@ import web.application.development.teacher.Teacher;
 import web.application.development.team.Team;
 
 @Entity
-public class Predmet {
+public class Predavanje {
 
 	@Id	//primary key
 	private String id;
 	private String identifier;
-	private Boolean auto_enrolment;
+	private Boolean auto_enrolment; //JSON takes enrolment as argument, JSON representation is enrolment_auto
 	
 	@OneToMany
 	private List<Team> teams;
@@ -32,7 +29,7 @@ public class Predmet {
 	@ManyToMany
 	private List<Teacher> teachers;
 
-	public Predmet(String id, String identifier, Boolean auto_enrolment) {
+	public Predavanje(String id, String identifier, Boolean auto_enrolment) {
 		super();
 		this.id = id;
 		this.identifier = identifier;
@@ -41,7 +38,7 @@ public class Predmet {
 		students = new ArrayList<Student>();
 	}
 	
-	public Predmet() {
+	public Predavanje() {
 	}
 
 	public String getId() {
