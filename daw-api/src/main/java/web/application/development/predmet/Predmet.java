@@ -1,14 +1,21 @@
 package web.application.development.predmet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import web.application.development.student.Student;
+import web.application.development.teacher.Teacher;
 import web.application.development.team.Team;
 
-@Entity 
+@Entity
 public class Predmet {
 
 	@Id	//primary key
@@ -18,6 +25,12 @@ public class Predmet {
 	
 	@OneToMany
 	private List<Team> teams;
+	
+	@ManyToMany
+	private List<Student> students;
+	
+	@ManyToMany
+	private List<Teacher> teachers;
 
 	public Predmet(String id, String identifier, Boolean auto_enrolment) {
 		super();
@@ -25,6 +38,7 @@ public class Predmet {
 		this.identifier = identifier;
 		this.auto_enrolment = auto_enrolment;
 		teams = new ArrayList<Team>();
+		students = new ArrayList<Student>();
 	}
 	
 	public Predmet() {
@@ -75,4 +89,33 @@ public class Predmet {
 		}
 		this.teams.removeAll(teams);
 	}
+
+	public List<Student> getStudents() {
+		return students;
+	}
+
+	public void setStudents(List<Student> students) {
+		this.students = students;
+	}
+
+	public List<Teacher> getTeachers() {
+		return teachers;
+	}
+
+	public void setTeachers(List<Teacher> teachers) {
+		this.teachers = teachers;
+	}
+	
+	public void assignTeacherToClass(Teacher teacher) {
+		if (!this.teachers.contains(teacher)) {
+			this.teachers.add(teacher);
+		}
+	}
+	
+	public void enrollIntoClass(Student student) {
+		if (!this.students.contains(student)) {
+			this.students.add(student);
+		}
+	}
+	
 }

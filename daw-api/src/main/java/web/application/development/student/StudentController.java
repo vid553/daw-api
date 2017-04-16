@@ -24,12 +24,16 @@ import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.formatter.Formatter;
+import web.application.development.predmet.Predmet;
+import web.application.development.predmet.PredmetService;
 
 @RestController
 public class StudentController {
 	
 	@Autowired //marks this as something that needs dependency injection, injects existing studentService
 	private StudentService studentService;
+	@Autowired 
+	private PredmetService predmetService;
 	@Autowired
 	private Formatter formatter;
 	
@@ -63,6 +67,17 @@ public class StudentController {
 	@RequestMapping(value="/students/{id}", method=RequestMethod.DELETE)
 	public void deleteStudent(@PathVariable String id) {
 		studentService.deleteStudent(id);
+	}
+	
+	@RequestMapping(value="/students/{id}/{classId}", method=RequestMethod.POST) 
+	public void enrollStudentToClass(@PathVariable String id, @PathVariable String classId) {
+		Student student = studentService.getStudent(id);
+		student.enrollIntoClass(new Predmet(classId, "", false));
+		studentService.enrollStudentIntoClass(id, student);
+		
+		Predmet predmet = predmetService.getPredmet(classId);
+		predmet.enrollIntoClass(new Student(id, "","",""));
+		predmetService.enrollStudentIntoClass(classId, predmet);
 	}
 
 }

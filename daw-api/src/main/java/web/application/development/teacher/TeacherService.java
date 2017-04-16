@@ -52,4 +52,8 @@ public class TeacherService {
 		teacherRepository.save(teacher);
 	}
 	
+	public void assignTeacherToClass(String id, Teacher teacher) {
+		teacherRepository.save(teacher);
+	}
+	
 }
