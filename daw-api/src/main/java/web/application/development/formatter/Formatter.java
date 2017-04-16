@@ -15,8 +15,8 @@ import web.application.development.team.Team;
 import web.application.development.student.Student;
 
 import web.application.development.course.Course;
+import web.application.development.predavanje.Predavanje;
 import web.application.development.semester.Semester;
-import web.application.development.predmet.Predmet;
 
 
 @Component
@@ -33,9 +33,9 @@ public class Formatter {
 			    .addProperty("email", student.getEmail())
 			    .addProperty("number", student.getNumber());
 		
-		List<Predmet> predmeti = student.getClasses();
+		List<Predavanje> predmeti = student.getClasses();
 		
-		for (Predmet p : predmeti) {
+		for (Predavanje p : predmeti) {
 			studentEntity.addEntity(ReturnJSON(p));
 		}
 		
@@ -45,7 +45,7 @@ public class Formatter {
 	}
 	
 	//returns Siren representation of Student
-	public JsonObject ReturnJSON(Student student, Predmet predmet) {
+	public JsonObject ReturnJSON(Student student, Predavanje predmet) {
 
 		String Uri = "http://localhost:8080/students/" + student.getId();
 		EntityBuilder studentEntity = Siren.createEntityBuilder()
@@ -84,9 +84,9 @@ public class Formatter {
 					teacherEntity.addEntity(ReturnJSON(c));
 				}
 				
-				List<Predmet> predmets = teacher.getPredmeti();
+				List<Predavanje> predmets = teacher.getPredavanje();
 				
-				for (Predmet p : predmets) {
+				for (Predavanje p : predmets) {
 					teacherEntity.addEntity(ReturnJSON(p));
 				}
 				
@@ -98,7 +98,7 @@ public class Formatter {
 	}
 
 	//returns Siren representation of Teacher
-	public JsonObject ReturnJSON(Teacher teacher, Predmet p) {
+	public JsonObject ReturnJSON(Teacher teacher, Predavanje p) {
 
 		String Uri = "http://localhost:8080/teachers/" + teacher.getId();
 		EntityBuilder teacherEntity = Siren.createEntityBuilder()
@@ -169,8 +169,8 @@ public class Formatter {
 			    .addProperty("season", semester.getSeason())
 			    .addProperty("leto", semester.getLeto());
 			    
-		List<Predmet> predmeti = semester.getPredmeti();
-		for (Predmet p : predmeti) {
+		List<Predavanje> predmeti = semester.getPredmeti();
+		for (Predavanje p : predmeti) {
 			semesterEntity.addEntity(ReturnJSON(p));
 		}
 		semesterEntity.addLink(URI.create(Uri), "self");
@@ -179,7 +179,7 @@ public class Formatter {
 	}
 	
 	//returns Siren representation of class
-	public JsonObject ReturnJSON(Predmet predmet) {
+	public JsonObject ReturnJSON(Predavanje predmet) {
 
 		String Uri = "http://localhost:8080/classes/" + predmet.getId();
 		EntityBuilder predmetEntity = Siren.createEntityBuilder()
@@ -196,13 +196,13 @@ public class Formatter {
 		List<Student> students = predmet.getStudents();
 		
 		for (Student s : students) {
-			predmetEntity.addEntity(ReturnJSON(s, new Predmet()));
+			predmetEntity.addEntity(ReturnJSON(s, new Predavanje()));
 		}
 		
 		List<Teacher> teachers = predmet.getTeachers();
 		
 		for (Teacher t : teachers) {
-			predmetEntity.addEntity(ReturnJSON(t, new Predmet()));
+			predmetEntity.addEntity(ReturnJSON(t, new Predavanje()));
 		}
 		
 	    predmetEntity.addLink(URI.create(Uri), "self");
@@ -268,12 +268,12 @@ public class Formatter {
 	}
 	
 	//returns Siren representation of a list of classes, has dummy argument because of problems with erasure
-		public JsonObject ReturnJSON(List<Predmet> predmeti, Predmet pre) {
+		public JsonObject ReturnJSON(List<Predavanje> predmeti, Predavanje pre) {
 			String Uri = "http://localhost:8080/classes";
 			EntityBuilder Predmeti = Siren.createEntityBuilder();
 			Predmeti.addClass("classes");
 			
-			for (Predmet p : predmeti) {
+			for (Predavanje p : predmeti) {
 				Predmeti.addEntity(ReturnJSON(p));
 			}
 			

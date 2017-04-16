@@ -5,10 +5,9 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import web.application.development.predmet.Predmet;
+import web.application.development.predavanje.Predavanje;
 
 @Entity 
 public class Course {
@@ -19,21 +18,21 @@ public class Course {
 	private String acronim;
 	
 	@OneToMany
-	List<Predmet> classes;
+	List<Predavanje> classes;
 
 	public Course(String id, String name, String acronim) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.acronim = acronim;
-		classes = new ArrayList<Predmet>();
+		classes = new ArrayList<Predavanje>();
 	}
 	
-	public List<Predmet> getClasses() {
+	public List<Predavanje> getClasses() {
 		return classes;
 	}
 
-	public void setClasses(List<Predmet> classes) {
+	public void setClasses(List<Predavanje> classes) {
 		this.classes = classes;
 	}
 
@@ -64,13 +63,13 @@ public class Course {
 		this.acronim = acronim;
 	}
 	
-	public void addClass(Predmet predmet) {
+	public void addClass(Predavanje predmet) {
 		this.classes.add(predmet);
 	}
 	
-	public void removeClass(Predmet predmet) {
-		List<Predmet> classes = new ArrayList<Predmet>();
-		for(Predmet p : this.classes){
+	public void removeClass(Predavanje predmet) {
+		List<Predavanje> classes = new ArrayList<Predavanje>();
+		for(Predavanje p : this.classes){
 		    if(p.getId().equals(predmet.getId())) {
 		    	classes.add(p);
 		    }

@@ -1,27 +1,15 @@
 package web.application.development.teacher;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
-import org.springframework.hateoas.ResourceSupport;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import com.sebastian_daschner.siren4javaee.*;
-
 import web.application.development.course.Course;
-import web.application.development.predmet.Predmet;
-import web.application.development.student.Student;
+import web.application.development.predavanje.Predavanje;
 
 @Entity 
 public class Teacher{
@@ -36,8 +24,8 @@ public class Teacher{
 	@OneToMany
 	private List<Course> courses;
 
-	@ManyToMany(targetEntity = Predmet.class)
-	private List<Predmet> predmeti;
+	@ManyToMany(targetEntity = Predavanje.class)
+	private List<Predavanje> predavanja;
 
 	public Teacher(String id, String name, String email, String number, Boolean admin) {
 		super();
@@ -47,6 +35,7 @@ public class Teacher{
 		this.number = number;
 		this.admin = admin;
 		courses = new ArrayList<Course>();
+		predavanja = new ArrayList<Predavanje>();
 	}
 	
 	public Teacher() {
@@ -117,17 +106,17 @@ public class Teacher{
 		this.courses.removeAll(courses);
 	}
 	
-	public void assignTeacherToClass(Predmet predmet) {
-		if (!this.predmeti.contains(predmet)) {
-			this.predmeti.add(predmet);
+	public void assignTeacherToClass(Predavanje predmet) {
+		if (!this.predavanja.contains(predmet)) {
+			this.predavanja.add(predmet);
 		}
 	}
 
-	public List<Predmet> getPredmeti() {
-		return predmeti;
+	public List<Predavanje> getPredavanje() {
+		return predavanja;
 	}
 
-	public void setPredmeti(List<Predmet> predmeti) {
-		this.predmeti = predmeti;
+	public void setPredavanje(List<Predavanje> predmeti) {
+		this.predavanja = predmeti;
 	}
 }

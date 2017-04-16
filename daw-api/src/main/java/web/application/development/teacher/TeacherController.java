@@ -1,14 +1,10 @@
 package web.application.development.teacher;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 import java.util.List;
 
 import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.HttpMessageConverters;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sebastian_daschner.siren4javaee.Entity;
@@ -25,10 +20,8 @@ import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.course.Course;
 import web.application.development.formatter.Formatter;
-import web.application.development.predmet.Predmet;
-import web.application.development.predmet.PredmetService;
-import web.application.development.student.Student;
-import web.application.development.team.Team;
+import web.application.development.predavanje.Predavanje;
+import web.application.development.predavanje.PredavanjeService;
 
 @RestController
 public class TeacherController {
@@ -36,7 +29,7 @@ public class TeacherController {
 	@Autowired //marks this as something that needs dependency injection, injects existing topicService
 	private TeacherService teacherService;
 	@Autowired 
-	private PredmetService predmetService;
+	private PredavanjeService predmetService;
 	@Autowired
 	private Formatter formatter;
 	
@@ -93,10 +86,10 @@ public class TeacherController {
 	@RequestMapping(value="/teachers/{teacherId}/classes/{classId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
 	public void assignTeacherToClass(@PathVariable String teacherId, @PathVariable String classId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Teacher teacher = teacherService.getTeacher(teacherId);
-		teacher.assignTeacherToClass(new Predmet(classId, "",false));
+		teacher.assignTeacherToClass(new Predavanje(classId, "",false));
 		teacherService.assignTeacherToClass(teacherId, teacher);
 		
-		Predmet predmet = predmetService.getPredmet(classId);
+		Predavanje predmet = predmetService.getPredavanje(classId);
 		predmet.assignTeacherToClass(new Teacher(teacherId, "", "", "", false));
 		predmetService.assignTeacherToClass(classId, predmet);
 	}

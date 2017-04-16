@@ -19,9 +19,7 @@ import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.formatter.Formatter;
-import web.application.development.predmet.Predmet;
-import web.application.development.student.Student;
-import web.application.development.team.Team;
+import web.application.development.predavanje.Predavanje;
 
 @RestController
 public class SemesterController {
@@ -56,14 +54,14 @@ public class SemesterController {
 	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.POST)
 	public void addPredmetToSemester(@PathVariable String semesterId, @PathVariable String predmetId) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Semester semester = semesterService.getSemester(semesterId);
-		semester.addPredmet(new Predmet(predmetId, "", false));
+		semester.addPredmet(new Predavanje(predmetId, "", false));
 		semesterService.addPredmetToSemester(semesterId, semester);
 	}
 	
 	@RequestMapping(value="/semesters/{id}", method=RequestMethod.PUT)
 	public void updateSemester(@RequestBody Semester semester, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Semester temp = semesterService.getSemester(id);
-		List<Predmet> predmeti = temp.getPredmeti();
+		List<Predavanje> predmeti = temp.getPredmeti();
 		semester.setPredmeti(predmeti);
 		semesterService.updateSemester(id, semester);
 	}
@@ -76,7 +74,7 @@ public class SemesterController {
 	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.DELETE) //changes class in semester
 	public void removePredmetFromSemester(@PathVariable String semesterId, @PathVariable String predmetId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Semester temp = semesterService.getSemester(semesterId);
-		temp.removePredmet(new Predmet(predmetId, "", false));
+		temp.removePredmet(new Predavanje(predmetId, "", false));
 		semesterService.removePredmetFromSemester(semesterId, temp);
 	}
 }

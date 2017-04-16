@@ -5,11 +5,9 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import web.application.development.predmet.Predmet;
-import web.application.development.student.Student;
+import web.application.development.predavanje.Predavanje;
 
 @Entity 
 public class Semester {
@@ -21,7 +19,7 @@ public class Semester {
 	private String leto;
 	
 	@OneToMany
-	private List<Predmet> predmeti;
+	private List<Predavanje> predmeti;
 	
 
 	public Semester(String id, String name, String season, String leto) {
@@ -30,7 +28,7 @@ public class Semester {
 		this.name = name;
 		this.season = season;
 		this.leto = leto;
-		predmeti = new ArrayList<Predmet>();
+		predmeti = new ArrayList<Predavanje>();
 	}
 	
 	public Semester() {
@@ -68,21 +66,21 @@ public class Semester {
 		this.leto = leto;
 	}
 	
-	public List<Predmet> getPredmeti() {
+	public List<Predavanje> getPredmeti() {
 		return predmeti;
 	}
 
-	public void setPredmeti(List<Predmet> predmeti) {
+	public void setPredmeti(List<Predavanje> predmeti) {
 		this.predmeti = predmeti;
 	}
 	
-	public void addPredmet(Predmet predmet) {
+	public void addPredmet(Predavanje predmet) {
 		this.predmeti.add(predmet);
 	}
 	
-	public void removePredmet(Predmet predmet) {
-		List<Predmet> predmeti = new ArrayList<Predmet>();
-		for(Predmet p : this.predmeti){
+	public void removePredmet(Predavanje predmet) {
+		List<Predavanje> predmeti = new ArrayList<Predavanje>();
+		for(Predavanje p : this.predmeti){
 		    if(p.getId().equals(predmet.getId())) {
 		    	predmeti.add(p);
 		    }
