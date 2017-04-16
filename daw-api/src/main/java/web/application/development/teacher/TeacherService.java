@@ -1,19 +1,10 @@
 package web.application.development.teacher;
 
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.sebastian_daschner.siren4javaee.EntityBuilder;
-import com.sebastian_daschner.siren4javaee.Siren;
-
-import web.application.development.team.Team;
 
 @Service
 public class TeacherService {

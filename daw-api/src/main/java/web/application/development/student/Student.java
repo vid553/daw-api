@@ -1,30 +1,13 @@
 package web.application.development.student;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
-import org.springframework.hateoas.ResourceSupport;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import com.sebastian_daschner.siren4javaee.*;
-
-import web.application.development.predmet.Predmet;
-import web.application.development.team.Team;
+import web.application.development.predavanje.Predavanje;
 
 @Entity 
 public class Student{
@@ -35,8 +18,8 @@ public class Student{
 	private String email;
 	private String number;
 
-	@ManyToMany(targetEntity = Predmet.class)
-	private List<Predmet> predmeti;
+	@ManyToMany(targetEntity = Predavanje.class)
+	private List<Predavanje> predavanja;
 
 	public Student(String id, String name, String email, String number) {
 		super();
@@ -44,15 +27,15 @@ public class Student{
 		this.name = name;
 		this.email = email;
 		this.number = number;
-		this.predmeti = new ArrayList<Predmet>();
+		this.predavanja = new ArrayList<Predavanje>();
 	}
 
-	public List<Predmet> getClasses() {
-		return predmeti;
+	public List<Predavanje> getClasses() {
+		return predavanja;
 	}
 
-	public void setClasses(List<Predmet> classes) {
-		this.predmeti = classes;
+	public void setClasses(List<Predavanje> classes) {
+		this.predavanja = classes;
 	}
 
 	public Student() {
@@ -90,9 +73,9 @@ public class Student{
 		this.number = number;
 	}
 	
-	public void enrollIntoClass(Predmet predmet) {
-		if (!this.predmeti.contains(predmet)) {
-			this.predmeti.add(predmet);
+	public void enrollIntoClass(Predavanje predavanje) {
+		if (!this.predavanja.contains(predavanje)) {
+			this.predavanja.add(predavanje);
 		}
 	}
 

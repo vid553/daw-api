@@ -19,8 +19,7 @@ import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.formatter.Formatter;
-import web.application.development.predmet.Predmet;
-import web.application.development.teacher.Teacher;
+import web.application.development.predavanje.Predavanje;
 
 @RestController
 public class CourseController {
@@ -56,14 +55,14 @@ public class CourseController {
 	@RequestMapping(value="/courses/{courseId}/{classId}", method=RequestMethod.POST) //adds existing class to a course
 	public void addClassToCourse(@PathVariable String classId, @PathVariable String courseId) {
 		Course course = courseService.getCourse(courseId);
-		course.addClass(new Predmet(classId, "", false));
+		course.addClass(new Predavanje(classId, "", false));
 		courseService.addClassToCourse(courseId, course);
 	}
 	
 	@RequestMapping(value="/courses/{courseId}", method=RequestMethod.PUT)
 	public void updateCourse(@RequestBody Course course, @PathVariable String courseId) {
 		Course temp = courseService.getCourse(courseId);
-		List<Predmet> classes = temp.getClasses();
+		List<Predavanje> classes = temp.getClasses();
 		course.setClasses(classes);
 		courseService.updateCourse(courseId, course);
 	}
@@ -76,7 +75,7 @@ public class CourseController {
 	@RequestMapping(value="/courses/{courseId}/{classId}", method=RequestMethod.DELETE) //removes course from teacher, body has to have course ID
 	public void remveStudentFromGroup(@PathVariable String courseId, @PathVariable String classId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Course temp = courseService.getCourse(courseId);
-		temp.removeClass(new Predmet(classId, "", false));
+		temp.removeClass(new Predavanje(classId, "", false));
 		courseService.removeClassFromCourse(courseId, temp);
 	}
 }

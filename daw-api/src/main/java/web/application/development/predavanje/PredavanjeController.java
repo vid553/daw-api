@@ -1,4 +1,4 @@
-package web.application.development.predmet;
+package web.application.development.predavanje;
 
 import java.util.List;
 
@@ -19,28 +19,27 @@ import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.formatter.Formatter;
-import web.application.development.student.Student;
 import web.application.development.team.Team;
 
 @RestController
-public class PredmetController {
+public class PredavanjeController {
 	
 	@Autowired //marks this as something that needs dependency injection, injects existing topicService
-	private PredmetService predmetService;
+	private PredavanjeService predavanjeService;
 	@Autowired
 	private Formatter formatter;
 	
 	@RequestMapping(value="/classes", method=RequestMethod.GET) //maps URL /predmeti to method getAllPredmeti
 	public ResponseEntity<Entity> getAllPredmeti() {
-		JsonObject object = formatter.ReturnJSON(predmetService.getAllPredmeti(), new Predmet());
+		JsonObject object = formatter.ReturnJSON(predavanjeService.getAllPredavanje(), new Predavanje());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.GET)
-	public HttpEntity<Entity> getPredmet(@PathVariable String id) {
-		Predmet predmet = predmetService.getPredmet(id);
+	public HttpEntity<Entity> getPredavanje(@PathVariable String id) {
+		Predavanje predmet = predavanjeService.getPredavanje(id);
 		JsonObject object = formatter.ReturnJSON(predmet);
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
@@ -48,8 +47,8 @@ public class PredmetController {
 	}
 	
 	@RequestMapping(value="/classes", method=RequestMethod.POST)
-	public void addPredmet(@RequestBody Predmet predmet) { //@RequestBody tells spring that the request pay load is going to contain a user
-		predmetService.addPredmet(predmet);
+	public void addPredavanje(@RequestBody Predavanje predmet) { //@RequestBody tells spring that the request pay load is going to contain a user
+		predavanjeService.addPredavanje(predmet);
 	}
 	/*example of pay load
 	 * {
@@ -60,29 +59,29 @@ public class PredmetController {
 	 */
 	
 	@RequestMapping(value="/classes/{predmetId}/{teamId}", method=RequestMethod.POST)
-	public void addTeamToPredmet(@PathVariable String predmetId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
-		Predmet predmet = predmetService.getPredmet(predmetId);
+	public void addTeamToPredavanje(@PathVariable String predmetId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
+		Predavanje predmet = predavanjeService.getPredavanje(predmetId);
 		predmet.addTeam(new Team(teamId,"",0));
-		predmetService.addTeamToPredmet(predmetId, predmet);
+		predavanjeService.addTeamToPredavanje(predmetId, predmet);
 	}
 	
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.PUT)
-	public void updatePredmet(@RequestBody Predmet predmet, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
-		Predmet temp = predmetService.getPredmet(id);
+	public void updatePredavanje(@RequestBody Predavanje predmet, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
+		Predavanje temp = predavanjeService.getPredavanje(id);
 		List<Team> teams = temp.getTeams();
 		predmet.setTeams(teams);
-		predmetService.updatePredmet(id, predmet);
+		predavanjeService.updatePredavanje(id, predmet);
 	}
 	
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.DELETE)
 	public void deletePredmet(@PathVariable String id) {
-		predmetService.deletePredmet(id);
+		predavanjeService.deletePredavanje(id);
 	}
 	
 	@RequestMapping(value="/classes/{predmetId}/{teamId}", method=RequestMethod.DELETE)
 	public void removeTeamFromPredmet(@PathVariable String predmetId, @PathVariable String teamId) {
-		Predmet temp = predmetService.getPredmet(predmetId);
+		Predavanje temp = predavanjeService.getPredavanje(predmetId);
 		temp.removeTeam(new Team(teamId, "", 0));
-		predmetService.removeTeamfromPredmet(predmetId, temp);
+		predavanjeService.removeTeamfromPredavanje(predmetId, temp);
 	}
 }

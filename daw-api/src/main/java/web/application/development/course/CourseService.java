@@ -1,14 +1,10 @@
 package web.application.development.course;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import web.application.development.predmet.Predmet;
-import web.application.development.teacher.Teacher;
 
 @Service
 public class CourseService {
