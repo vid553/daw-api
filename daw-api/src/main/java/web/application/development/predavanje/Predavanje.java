@@ -3,12 +3,18 @@ package web.application.development.predavanje;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PreRemove;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import web.application.development.course.Course;
+import web.application.development.semester.Semester;
 import web.application.development.student.Student;
 import web.application.development.teacher.Teacher;
 import web.application.development.team.Team;
@@ -21,7 +27,7 @@ public class Predavanje {
 	private String identifier;
 	private Boolean auto_enrolment; //JSON takes enrolment as argument, JSON representation is enrolment_auto
 	
-	@OneToMany
+	@OneToMany//(mappedBy = "predavanje")
 	private List<Team> teams;
 	
 	@ManyToMany
@@ -29,7 +35,13 @@ public class Predavanje {
 	
 	@ManyToMany
 	private List<Teacher> teachers;
-
+	
+	/*//@ManyToOne(optional=true)
+	private Course course;
+	
+	//@ManyToOne(optional=true)
+	private Semester semester;
+*/
 	public Predavanje(String id, String identifier, Boolean auto_enrolment) {
 		super();
 		this.id = id;
@@ -126,5 +138,21 @@ public class Predavanje {
 	        t.getPredavanje().remove(this);
 	    }
 	}
-	
+	/*
+	public Course getCourse() {
+		return course;
+	}
+
+	public void setCourse(Course course) {
+		this.course = course;
+	}
+
+	public Semester getSemester() {
+		return semester;
+	}
+
+	public void setSemester(Semester semester) {
+		this.semester = semester;
+	}
+*/
 }

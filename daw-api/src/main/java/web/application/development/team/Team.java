@@ -20,6 +20,9 @@ public class Team{
 	@OneToMany
 	private List<Student> students;
 	
+	//@ManyToOne(optional=true)
+	//private Predavanje predavanje;
+	
 	public Team(String id, String name, int students_limit) {
 		super();
 		this.id = id;

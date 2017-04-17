@@ -69,19 +69,19 @@ public class PredavanjeController {
 		predmet.setTeams(teams);
 		predavanjeService.updatePredavanje(id, predmet);
 	}
-	
-	//works
-	@RequestMapping(value="/classes/{id}", method=RequestMethod.DELETE)
-	public void deletePredmet(@PathVariable String id) {
-		predavanjeService.deletePredavanje(id);
-	}
-	
+
 	//works
 	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.POST)
 	public void addTeamToPredavanje(@PathVariable String predavanjeId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Predavanje predmet = predavanjeService.getPredavanje(predavanjeId);
 		predmet.addTeam(new Team(teamId,"",0));
 		predavanjeService.addTeamToPredavanje(predavanjeId, predmet);
+	}
+	
+	//works
+	@RequestMapping(value="/classes/{id}", method=RequestMethod.DELETE)
+	public void deletePredmet(@PathVariable String id) {
+		predavanjeService.deletePredavanje(id);
 	}
 	
 	//works

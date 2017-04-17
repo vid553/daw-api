@@ -62,6 +62,17 @@ public class TeacherController {
 		teacherService.addCourseToTeacher(teacherId, teacher);
 	}
 	
+	@RequestMapping(value="/teachers/{teacherId}/classes/{classId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
+	public void assignTeacherToClass(@PathVariable String teacherId, @PathVariable String classId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+		Teacher teacher = teacherService.getTeacher(teacherId);
+		teacher.assignTeacherToClass(new Predavanje(classId, "",false));
+		teacherService.assignTeacherToClass(teacherId, teacher);
+		
+		Predavanje predmet = predmetService.getPredavanje(classId);
+		predmet.assignTeacherToClass(new Teacher(teacherId, "", "", "", false));
+		predmetService.assignTeacherToClass(classId, predmet);
+	}
+
 	@RequestMapping(value="/teachers/{teacherId}", method=RequestMethod.PUT)
 	public void updateUser(@RequestBody Teacher teacher, @PathVariable String teacherId) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Teacher temp = teacherService.getTeacher(teacherId);
@@ -83,15 +94,5 @@ public class TeacherController {
 		teacherService.removeCourseFromTeacher(teacherId, temp);
 	}
 	
-	@RequestMapping(value="/teachers/{teacherId}/classes/{classId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
-	public void assignTeacherToClass(@PathVariable String teacherId, @PathVariable String classId) { //@RequestBody tells spring that the request pay load is going to contain a topics
-		Teacher teacher = teacherService.getTeacher(teacherId);
-		teacher.assignTeacherToClass(new Predavanje(classId, "",false));
-		teacherService.assignTeacherToClass(teacherId, teacher);
-		
-		Predavanje predmet = predmetService.getPredavanje(classId);
-		predmet.assignTeacherToClass(new Teacher(teacherId, "", "", "", false));
-		predmetService.assignTeacherToClass(classId, predmet);
-	}
 
 }
