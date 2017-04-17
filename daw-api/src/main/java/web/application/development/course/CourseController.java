@@ -21,6 +21,7 @@ import com.sebastian_daschner.siren4javaee.Siren;
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
+import web.application.development.teacher.TeacherService;
 
 @RestController
 public class CourseController {

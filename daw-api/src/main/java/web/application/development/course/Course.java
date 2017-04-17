@@ -5,9 +5,12 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PreRemove;
 
 import web.application.development.predavanje.Predavanje;
+import web.application.development.teacher.Teacher;
 
 @Entity 
 public class Course {
@@ -19,6 +22,9 @@ public class Course {
 	
 	@OneToMany(targetEntity = Predavanje.class)
 	private List<Predavanje> classes;
+	
+	@ManyToOne
+	private Teacher teacher;
 
 	public Course(String id, String name, String acronim) {
 		super();
@@ -77,4 +83,17 @@ public class Course {
 		this.classes.removeAll(classes);
 	}
 
+	public Teacher getTeacher() {
+		return teacher;
+	}
+
+	public void setTeacher(Teacher teacher) {
+		this.teacher = teacher;
+	}
+	
+	@PreRemove
+	private void removeTeacher() {
+	    
+	    this.teacher.getCourses().remove(this);
+	}
 }

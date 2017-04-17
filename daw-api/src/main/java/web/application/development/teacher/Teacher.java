@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PreRemove;
 
@@ -22,7 +23,7 @@ public class Teacher{
 	private String number;
 	private Boolean admin;
 	
-	@OneToMany
+	@OneToMany(targetEntity = Course.class)
 	private List<Course> courses;
 
 	@ManyToMany(targetEntity = Predavanje.class)

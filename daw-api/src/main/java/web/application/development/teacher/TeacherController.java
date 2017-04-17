@@ -19,6 +19,7 @@ import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.course.Course;
+import web.application.development.course.CourseService;
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
@@ -30,6 +31,8 @@ public class TeacherController {
 	private TeacherService teacherService;
 	@Autowired 
 	private PredavanjeService predmetService;
+	@Autowired
+	private CourseService courseService;
 	@Autowired
 	private Formatter formatter;
 	
@@ -60,6 +63,10 @@ public class TeacherController {
 		Teacher teacher = teacherService.getTeacher(teacherId);
 		teacher.addCourse(new Course(courseId, "",""));
 		teacherService.addCourseToTeacher(teacherId, teacher);
+		
+		Course course = courseService.getCourse(courseId);
+		course.setTeacher(teacher);
+		courseService.updateCourse(courseId, course);
 	}
 	
 	@RequestMapping(value="/teachers/{teacherId}/classes/{classId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
