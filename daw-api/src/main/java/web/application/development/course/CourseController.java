@@ -63,6 +63,10 @@ public class CourseController {
 		Course course = courseService.getCourse(courseId);
 		course.addClass(new Predavanje(classId, "", false));
 		courseService.addClassToCourse(courseId, course);
+		
+		Predavanje predavanje = predavanjeService.getPredavanje(classId);
+		predavanje.setCourse(course);
+		predavanjeService.updatePredavanje(classId, predavanje);
 	}
 	
 	@RequestMapping(value="/courses/{courseId}", method=RequestMethod.PUT)

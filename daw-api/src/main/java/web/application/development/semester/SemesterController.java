@@ -20,12 +20,15 @@ import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
+import web.application.development.predavanje.PredavanjeService;
 
 @RestController
 public class SemesterController {
 	
 	@Autowired //marks this as something that needs dependency injection, injects existing topicService
 	private SemesterService semesterService;
+	@Autowired 
+	private PredavanjeService predavanjeService;
 	@Autowired
 	private Formatter formatter;
 	
@@ -60,6 +63,10 @@ public class SemesterController {
 		Semester semester = semesterService.getSemester(semesterId);
 		semester.addPredmet(new Predavanje(predmetId, "", false));
 		semesterService.addPredmetToSemester(semesterId, semester);
+		
+		Predavanje predavanje = predavanjeService.getPredavanje(predmetId);
+		predavanje.setSemester(semester);
+		predavanjeService.updatePredavanje(predmetId, predavanje);
 	}
 	
 	//works
@@ -78,8 +85,8 @@ public class SemesterController {
 	}
 	
 	//works
-	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.DELETE) //changes class in semester
-	public void removePredmetFromSemester(@PathVariable String semesterId, @PathVariable String predmetId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.DELETE) 
+	public void removePredmetFromSemester(@PathVariable String semesterId, @PathVariable String predmetId) {
 		Semester temp = semesterService.getSemester(semesterId);
 		temp.removePredmet(new Predavanje(predmetId, "", false));
 		semesterService.removePredmetFromSemester(semesterId, temp);
