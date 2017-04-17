@@ -113,11 +113,11 @@ public class Teacher{
 		}
 	}
 
-	public List<Predavanje> getPredavanje() {
+	public List<Predavanje> getPredavanja() {
 		return predavanja;
 	}
 
-	public void setPredavanje(List<Predavanje> predmeti) {
+	public void setPredavanja(List<Predavanje> predmeti) {
 		this.predavanja = predmeti;
 	}
 	

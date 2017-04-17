@@ -20,12 +20,15 @@ import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.formatter.Formatter;
 import web.application.development.team.Team;
+import web.application.development.team.TeamService;
 
 @RestController
 public class PredavanjeController {
 	
 	@Autowired //marks this as something that needs dependency injection, injects existing topicService
 	private PredavanjeService predavanjeService;
+	@Autowired
+	private TeamService teamService;
 	@Autowired
 	private Formatter formatter;
 	
@@ -42,10 +45,14 @@ public class PredavanjeController {
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.GET)
 	public HttpEntity<Entity> getPredavanje(@PathVariable String id) {
 		Predavanje predmet = predavanjeService.getPredavanje(id);
-		JsonObject object = formatter.ReturnJSON(predmet);
-		EntityReader entityReader = Siren.createEntityReader();
-		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		if (predmet != null) {
+			JsonObject object = formatter.ReturnJSON(predmet);
+			EntityReader entityReader = Siren.createEntityReader();
+			Entity entity = entityReader.read(object);
+			return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		}
+		
+		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
 	//doesnt work if uri contains special characters
@@ -76,6 +83,10 @@ public class PredavanjeController {
 		Predavanje predmet = predavanjeService.getPredavanje(predavanjeId);
 		predmet.addTeam(new Team(teamId,"",0));
 		predavanjeService.addTeamToPredavanje(predavanjeId, predmet);
+		
+		Team team = teamService.getGroup(teamId);
+		team.setPredavanje(predmet);
+		teamService.updateGroup(teamId, team);
 	}
 	
 	//works

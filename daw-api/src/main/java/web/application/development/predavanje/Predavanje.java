@@ -27,7 +27,7 @@ public class Predavanje {
 	private String identifier;
 	private Boolean auto_enrolment; //JSON takes enrolment as argument, JSON representation is enrolment_auto
 	
-	@OneToMany//(mappedBy = "predavanje")
+	@OneToMany(targetEntity = Team.class)
 	private List<Team> teams;
 	
 	@ManyToMany
@@ -36,12 +36,12 @@ public class Predavanje {
 	@ManyToMany
 	private List<Teacher> teachers;
 	
-	/*//@ManyToOne(optional=true)
+	@ManyToOne
 	private Course course;
 	
-	//@ManyToOne(optional=true)
+	@ManyToOne
 	private Semester semester;
-*/
+
 	public Predavanje(String id, String identifier, Boolean auto_enrolment) {
 		super();
 		this.id = id;
@@ -49,6 +49,8 @@ public class Predavanje {
 		this.auto_enrolment = auto_enrolment;
 		teams = new ArrayList<Team>();
 		students = new ArrayList<Student>();
+		this.course = new Course();
+		this.semester = new Semester();
 	}
 	
 	public Predavanje() {
@@ -135,10 +137,14 @@ public class Predavanje {
 	    }
 	    
 	    for (Teacher t : this.teachers) {
-	        t.getPredavanje().remove(this);
+	        t.getPredavanja().remove(this);
 	    }
+	    
+	    semester.getPredmeti().remove(this);
+	    
+	    course.getClasses().remove(this);
 	}
-	/*
+	
 	public Course getCourse() {
 		return course;
 	}
@@ -154,5 +160,5 @@ public class Predavanje {
 	public void setSemester(Semester semester) {
 		this.semester = semester;
 	}
-*/
+
 }

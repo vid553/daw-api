@@ -17,7 +17,7 @@ public class Course {
 	private String name;
 	private String acronim;
 	
-	@OneToMany//(mappedBy = "course")
+	@OneToMany(targetEntity = Predavanje.class)
 	private List<Predavanje> classes;
 
 	public Course(String id, String name, String acronim) {
