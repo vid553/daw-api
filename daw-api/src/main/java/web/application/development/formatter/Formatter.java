@@ -84,7 +84,7 @@ public class Formatter {
 					teacherEntity.addEntity(ReturnJSON(c));
 				}
 				
-				List<Predavanje> predmets = teacher.getPredavanje();
+				List<Predavanje> predmets = teacher.getPredavanja();
 				
 				for (Predavanje p : predmets) {
 					teacherEntity.addEntity(ReturnJSON(p));
@@ -147,15 +147,20 @@ public class Formatter {
 	public JsonObject ReturnJSON(Course course) {
 
 		String Uri = "http://localhost:8080/courses/" + course.getId();
-		JsonObject semesterEntity = Siren.createEntityBuilder()
+		EntityBuilder courseEntity = Siren.createEntityBuilder()
 			    .addClass("course")
 			    .addProperty("id", course.getId())
 			    .addProperty("name", course.getName())
-			    .addProperty("acronim", course.getAcronim())
-			    .addLink(URI.create(Uri), "self")
-			    .build();
+			    .addProperty("acronim", course.getAcronim());
 		
-		return semesterEntity;
+		List<Predavanje> classes = course.getClasses();
+	
+			for (Predavanje p : classes) {
+				courseEntity.addEntity(ReturnJSON(p));
+			}
+		    courseEntity.addLink(URI.create(Uri), "self");
+		
+		return courseEntity.build();
 	}
 	
 	//returns Siren representation of Semester
@@ -173,6 +178,25 @@ public class Formatter {
 		for (Predavanje p : predmeti) {
 			semesterEntity.addEntity(ReturnJSON(p));
 		}
+		semesterEntity.addLink(URI.create(Uri), "self");
+		
+		return semesterEntity.build();
+	}
+	
+	public JsonObject ReturnJSON(Semester semester, Predavanje pre) {
+
+		String Uri = "http://localhost:8080/semesters/" + semester.getId();
+		EntityBuilder semesterEntity = Siren.createEntityBuilder()
+			    .addClass("semester")
+			    .addProperty("id", semester.getId())
+			    .addProperty("name", semester.getName())
+			    .addProperty("season", semester.getSeason())
+			    .addProperty("leto", semester.getLeto());
+		/*	    
+		List<Predavanje> predmeti = semester.getPredmeti();
+		for (Predavanje p : predmeti) {
+			semesterEntity.addEntity(ReturnJSON(p));
+		}*/
 		semesterEntity.addLink(URI.create(Uri), "self");
 		
 		return semesterEntity.build();
@@ -204,6 +228,8 @@ public class Formatter {
 		for (Teacher t : teachers) {
 			predmetEntity.addEntity(ReturnJSON(t, new Predavanje()));
 		}
+		
+		predmetEntity.addEntity(ReturnJSON(predmet.getSemester(), new Predavanje()));
 		
 	    predmetEntity.addLink(URI.create(Uri), "self");
 		

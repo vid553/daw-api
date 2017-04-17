@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.PreRemove;
 
 import web.application.development.course.Course;
 import web.application.development.predavanje.Predavanje;
@@ -112,11 +113,18 @@ public class Teacher{
 		}
 	}
 
-	public List<Predavanje> getPredavanje() {
+	public List<Predavanje> getPredavanja() {
 		return predavanja;
 	}
 
-	public void setPredavanje(List<Predavanje> predmeti) {
+	public void setPredavanja(List<Predavanje> predmeti) {
 		this.predavanja = predmeti;
+	}
+	
+	@PreRemove
+	private void removePredavanjeFromTeacher() {
+	    for (Predavanje p : this.predavanja) {
+	        p.getTeachers().remove(this);
+	    }
 	}
 }

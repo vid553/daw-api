@@ -20,6 +20,7 @@ import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
+import web.application.development.predavanje.PredavanjeService;
 
 @RestController
 public class CourseController {
@@ -27,8 +28,11 @@ public class CourseController {
 	@Autowired //marks this as something that needs dependency injection, injects existing topicService
 	private CourseService courseService;
 	@Autowired
+	private PredavanjeService predavanjeService;
+	@Autowired
 	private Formatter formatter;
 	
+	//works
 	@RequestMapping(value="/courses", method=RequestMethod.GET) //maps URL /courses to method getAllCourses
 	public ResponseEntity<Entity> getAllCourses() {
 		JsonObject object = formatter.ReturnJSON(courseService.getAllCourses(), new Course());
@@ -37,6 +41,7 @@ public class CourseController {
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
+	//works if course exists, TODO: handle non-existing course, returns 500, should return 404
 	@RequestMapping(value="/courses/{id}", method=RequestMethod.GET)
 	public HttpEntity<Entity> getCourse(@PathVariable String id) {
 		Course course = courseService.getCourse(id);
@@ -46,6 +51,7 @@ public class CourseController {
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
+	//works
 	@RequestMapping(value="/courses", method=RequestMethod.POST)
 	public void addCourse(@RequestBody Course course) { //@RequestBody tells spring that the request pay load is going to contain a user
 		courseService.addCourse(course);
@@ -57,6 +63,10 @@ public class CourseController {
 		Course course = courseService.getCourse(courseId);
 		course.addClass(new Predavanje(classId, "", false));
 		courseService.addClassToCourse(courseId, course);
+		
+		Predavanje predavanje = predavanjeService.getPredavanje(classId);
+		predavanje.setCourse(course);
+		predavanjeService.updatePredavanje(classId, predavanje);
 	}
 	
 	@RequestMapping(value="/courses/{courseId}", method=RequestMethod.PUT)
@@ -67,6 +77,7 @@ public class CourseController {
 		courseService.updateCourse(courseId, course);
 	}
 	
+	//works
 	@RequestMapping(value="/courses/{id}", method=RequestMethod.DELETE)
 	public void deleteCourse(@PathVariable String id) {
 		courseService.deleteCourse(id);

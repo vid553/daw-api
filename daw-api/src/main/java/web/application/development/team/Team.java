@@ -5,8 +5,11 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PreRemove;
 
+import web.application.development.predavanje.Predavanje;
 import web.application.development.student.Student;
 
 @Entity 
@@ -20,12 +23,17 @@ public class Team{
 	@OneToMany
 	private List<Student> students;
 	
+	@ManyToOne//(optional=true)
+	private Predavanje predavanje;
+
+
 	public Team(String id, String name, int students_limit) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.students_limit = students_limit;
 		students = new ArrayList<Student>();
+		predavanje = new Predavanje();
 		//this.student = new Student("", "", "", "");
 	}
 
@@ -76,5 +84,19 @@ public class Team{
 		    }
 		}
 		this.students.removeAll(students);
+	}
+	
+	public Predavanje getPredavanje() {
+		return predavanje;
+	}
+
+	public void setPredavanje(Predavanje predavanje) {
+		this.predavanje = predavanje;
+	}
+	
+	@PreRemove
+	private void removeTeam() {
+	    
+	    this.predavanje.getTeams().remove(this);
 	}
 }

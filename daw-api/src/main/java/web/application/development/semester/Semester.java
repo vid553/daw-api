@@ -5,8 +5,10 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import web.application.development.course.Course;
 import web.application.development.predavanje.Predavanje;
 
 @Entity 
@@ -18,17 +20,17 @@ public class Semester {
 	private String season;
 	private String leto;
 	
-	@OneToMany
-	private List<Predavanje> predmeti;
+	@OneToMany(targetEntity = Predavanje.class)
+	private List<Predavanje> classes;
 	
-
+	//doesnt work if uri contains special characters
 	public Semester(String id, String name, String season, String leto) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.season = season;
 		this.leto = leto;
-		predmeti = new ArrayList<Predavanje>();
+		classes = new ArrayList<Predavanje>();
 	}
 	
 	public Semester() {
@@ -67,24 +69,24 @@ public class Semester {
 	}
 	
 	public List<Predavanje> getPredmeti() {
-		return predmeti;
+		return classes;
 	}
 
 	public void setPredmeti(List<Predavanje> predmeti) {
-		this.predmeti = predmeti;
+		this.classes = predmeti;
 	}
 	
 	public void addPredmet(Predavanje predmet) {
-		this.predmeti.add(predmet);
+		this.classes.add(predmet);
 	}
 	
 	public void removePredmet(Predavanje predmet) {
 		List<Predavanje> predmeti = new ArrayList<Predavanje>();
-		for(Predavanje p : this.predmeti){
+		for(Predavanje p : this.classes){
 		    if(p.getId().equals(predmet.getId())) {
 		    	predmeti.add(p);
 		    }
 		}
-		this.predmeti.removeAll(predmeti);
+		this.classes.removeAll(predmeti);
 	}
 }
