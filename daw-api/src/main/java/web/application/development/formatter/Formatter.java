@@ -147,15 +147,20 @@ public class Formatter {
 	public JsonObject ReturnJSON(Course course) {
 
 		String Uri = "http://localhost:8080/courses/" + course.getId();
-		JsonObject semesterEntity = Siren.createEntityBuilder()
+		EntityBuilder courseEntity = Siren.createEntityBuilder()
 			    .addClass("course")
 			    .addProperty("id", course.getId())
 			    .addProperty("name", course.getName())
-			    .addProperty("acronim", course.getAcronim())
-			    .addLink(URI.create(Uri), "self")
-			    .build();
+			    .addProperty("acronim", course.getAcronim());
 		
-		return semesterEntity;
+		List<Predavanje> classes = course.getClasses();
+	
+			for (Predavanje p : classes) {
+				courseEntity.addEntity(ReturnJSON(p));
+			}
+		    courseEntity.addLink(URI.create(Uri), "self");
+		
+		return courseEntity.build();
 	}
 	
 	//returns Siren representation of Semester

@@ -5,8 +5,10 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import web.application.development.course.Course;
 import web.application.development.predavanje.Predavanje;
 
 @Entity 
@@ -18,10 +20,10 @@ public class Semester {
 	private String season;
 	private String leto;
 	
-	@OneToMany
+	@OneToMany//(mappedBy = "semester")
 	private List<Predavanje> predmeti;
 	
-
+	//doesnt work if uri contains special characters
 	public Semester(String id, String name, String season, String leto) {
 		super();
 		this.id = id;

@@ -29,6 +29,7 @@ public class SemesterController {
 	@Autowired
 	private Formatter formatter;
 	
+	//works
 	@RequestMapping(value="/semesters", method=RequestMethod.GET) //maps URL /semesters to method getAllSemesters
 	public ResponseEntity<Entity> getAllSemesters() {
 		JsonObject object = formatter.ReturnJSON(semesterService.getAllSemesters(), new Semester());
@@ -37,6 +38,7 @@ public class SemesterController {
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
+	//works if semester exists, TODO: handle non-existing semester, returns 500, should return 404
 	@RequestMapping(value="/semesters/{id}", method=RequestMethod.GET)
 	public HttpEntity<Entity> getSemester(@PathVariable String id) {
 		Semester semester = semesterService.getSemester(id);
@@ -46,18 +48,21 @@ public class SemesterController {
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
+	//works
 	@RequestMapping(value="/semesters", method=RequestMethod.POST)
 	public void addSemester(@RequestBody Semester semester) { //@RequestBody tells spring that the request pay load is going to contain a user
 		semesterService.addSemester(semester);
 	}
 	
+	//works
 	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.POST)
-	public void addPredmetToSemester(@PathVariable String semesterId, @PathVariable String predmetId) { //@RequestBody tells spring that the request pay load is going to contain a user
+	public void addPredmetToSemester(@PathVariable String semesterId, @PathVariable String predmetId) { 
 		Semester semester = semesterService.getSemester(semesterId);
 		semester.addPredmet(new Predavanje(predmetId, "", false));
 		semesterService.addPredmetToSemester(semesterId, semester);
 	}
 	
+	//works
 	@RequestMapping(value="/semesters/{id}", method=RequestMethod.PUT)
 	public void updateSemester(@RequestBody Semester semester, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Semester temp = semesterService.getSemester(id);
@@ -66,11 +71,13 @@ public class SemesterController {
 		semesterService.updateSemester(id, semester);
 	}
 	
+	//works
 	@RequestMapping(value="/semesters/{id}", method=RequestMethod.DELETE)
 	public void deleteSemester(@PathVariable String id) {
 		semesterService.deleteSemester(id);
 	}
 	
+	//works
 	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.DELETE) //changes class in semester
 	public void removePredmetFromSemester(@PathVariable String semesterId, @PathVariable String predmetId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Semester temp = semesterService.getSemester(semesterId);

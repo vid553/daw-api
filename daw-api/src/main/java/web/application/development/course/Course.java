@@ -17,8 +17,8 @@ public class Course {
 	private String name;
 	private String acronim;
 	
-	@OneToMany
-	List<Predavanje> classes;
+	@OneToMany//(mappedBy = "course")
+	private List<Predavanje> classes;
 
 	public Course(String id, String name, String acronim) {
 		super();
