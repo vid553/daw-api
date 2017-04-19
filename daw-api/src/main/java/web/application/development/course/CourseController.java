@@ -129,7 +129,7 @@ public class CourseController {
 		course.setClasses(classes);
 		courseService.updateCourse(courseId, course);
 	}
-	
+	/*test123test*/
 	//works
 	@RequestMapping(value="/courses/{id}", method=RequestMethod.DELETE)
 	public void deleteCourse(@PathVariable String id) {
