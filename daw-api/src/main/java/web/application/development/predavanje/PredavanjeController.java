@@ -6,6 +6,7 @@ import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import com.sebastian_daschner.siren4javaee.Entity;
 import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
+import web.application.development.exception.Error;
 import web.application.development.formatter.Formatter;
 import web.application.development.team.Team;
 import web.application.development.team.TeamService;
@@ -32,24 +34,66 @@ public class PredavanjeController {
 	@Autowired
 	private Formatter formatter;
 	
-	//works
+	//works, if non-existing class -> returns 404
 	@RequestMapping(value="/classes", method=RequestMethod.GET) //maps URL /predmeti to method getAllPredmeti
-	public ResponseEntity<Entity> getAllPredmeti() {
-		JsonObject object = formatter.ReturnJSON(predavanjeService.getAllPredavanje(), new Predavanje());
-		EntityReader entityReader = Siren.createEntityReader();
-		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+	public ResponseEntity<?> getAllPredmeti() {
+		List<Predavanje> predavanja = predavanjeService.getAllPredavanje();
+		if (predavanja.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		else {
+			try {
+				JsonObject object = formatter.ReturnJSON(predavanja, new Predavanje());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
+		        HttpHeaders headers = new HttpHeaders();
+		        headers.add("Content-Type", "application/problem+json");
+		        headers.add("Content-Language", "en");
+		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
 	}
 	
-	//works if class exists, TODO: handle non-existing class, returns 500, should return 404
+	//works if class exists, if non-existing class -> returns 404
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.GET)
-	public HttpEntity<Entity> getPredavanje(@PathVariable String id) {
+	public HttpEntity<?> getPredavanje(@PathVariable String id) {
 		Predavanje predmet = predavanjeService.getPredavanje(id);
 		if (predmet != null) {
-			JsonObject object = formatter.ReturnJSON(predmet);
-			EntityReader entityReader = Siren.createEntityReader();
-			Entity entity = entityReader.read(object);
-			return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+			try {
+				JsonObject object = formatter.ReturnJSON(predmet);
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
+		        HttpHeaders headers = new HttpHeaders();
+		        headers.add("Content-Type", "application/problem+json");
+		        headers.add("Content-Language", "en");
+		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
 		}
 		
 		else return new ResponseEntity<>(HttpStatus.NOT_FOUND);

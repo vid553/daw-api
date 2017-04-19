@@ -13,7 +13,6 @@ import com.sebastian_daschner.siren4javaee.Siren;
 import web.application.development.teacher.Teacher;
 import web.application.development.team.Team;
 import web.application.development.student.Student;
-
 import web.application.development.course.Course;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.semester.Semester;
@@ -39,8 +38,7 @@ public class Formatter {
 			studentEntity.addEntity(ReturnJSON(p));
 		}
 		
-			    studentEntity.addLink(URI.create(Uri), "self");
-
+		studentEntity.addLink(URI.create(Uri), "self");
 		return studentEntity.build();
 	}
 	
@@ -61,8 +59,7 @@ public class Formatter {
 			studentEntity.addEntity(ReturnJSON(p));
 		}
 		*/
-			    studentEntity.addLink(URI.create(Uri), "self");
-
+		studentEntity.addLink(URI.create(Uri), "self");
 		return studentEntity.build();
 	}
 	
@@ -294,29 +291,30 @@ public class Formatter {
 	}
 	
 	//returns Siren representation of a list of classes, has dummy argument because of problems with erasure
-		public JsonObject ReturnJSON(List<Predavanje> predmeti, Predavanje pre) {
-			String Uri = "http://localhost:8080/classes";
-			EntityBuilder Predmeti = Siren.createEntityBuilder();
-			Predmeti.addClass("classes");
-			
-			for (Predavanje p : predmeti) {
-				Predmeti.addEntity(ReturnJSON(p));
-			}
-			
-			Predmeti.addLink(URI.create(Uri), "self");
-			return Predmeti.build();
+	public JsonObject ReturnJSON(List<Predavanje> predmeti, Predavanje pre) {
+		String Uri = "http://localhost:8080/classes";
+		EntityBuilder Predmeti = Siren.createEntityBuilder();
+		Predmeti.addClass("classes");
+		
+		for (Predavanje p : predmeti) {
+			Predmeti.addEntity(ReturnJSON(p));
 		}
 		
-		public JsonObject ReturnJSON(List<Team> groups, Team team) {
-			String Uri = "http://localhost:8080/groups";
-			EntityBuilder Groups = Siren.createEntityBuilder();
-			Groups.addClass("groups");
-			
-			for (Team p : groups) {
-				Groups.addEntity(ReturnJSON(p));
-			}
-			
-			Groups.addLink(URI.create(Uri), "self");
-			return Groups.build();
+		Predmeti.addLink(URI.create(Uri), "self");
+		return Predmeti.build();
+	}
+	
+	public JsonObject ReturnJSON(List<Team> groups, Team team) {
+		String Uri = "http://localhost:8080/groups";
+		EntityBuilder Groups = Siren.createEntityBuilder();
+		Groups.addClass("groups");
+		
+		for (Team p : groups) {
+			Groups.addEntity(ReturnJSON(p));
+		}
+		
+		Groups.addLink(URI.create(Uri), "self");
+		return Groups.build();
+		
 	}
 }
