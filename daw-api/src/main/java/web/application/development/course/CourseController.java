@@ -6,6 +6,7 @@ import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import com.sebastian_daschner.siren4javaee.Entity;
 import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
+import web.application.development.exception.Error;
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
@@ -32,23 +34,56 @@ public class CourseController {
 	@Autowired
 	private Formatter formatter;
 	
-	//works
+	//works, if non-existing class -> returns 404
 	@RequestMapping(value="/courses", method=RequestMethod.GET) //maps URL /courses to method getAllCourses
-	public ResponseEntity<Entity> getAllCourses() {
-		JsonObject object = formatter.ReturnJSON(courseService.getAllCourses(), new Course());
-		EntityReader entityReader = Siren.createEntityReader();
-		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+	public ResponseEntity<?> getAllCourses() {
+		List<Course> courses = courseService.getAllCourses();
+		if (courses.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		else {
+			try {
+				JsonObject object = formatter.ReturnJSON(courses, new Course());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+		        HttpHeaders headers = new HttpHeaders();
+		        headers.add("Content-Type", "application/problem+json");
+		        headers.add("Content-Language", "en");
+		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
 	}
 	
-	//works if course exists, TODO: handle non-existing course, returns 500, should return 404
+	//works if course exists, if non-existing class -> returns 404
 	@RequestMapping(value="/courses/{id}", method=RequestMethod.GET)
-	public HttpEntity<Entity> getCourse(@PathVariable String id) {
+	public HttpEntity<?> getCourse(@PathVariable String id) {
 		Course course = courseService.getCourse(id);
-		JsonObject object = formatter.ReturnJSON(course);
-		EntityReader entityReader = Siren.createEntityReader();
-		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		if (course != null) {
+			try {
+				JsonObject object = formatter.ReturnJSON(course);
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+		        HttpHeaders headers = new HttpHeaders();
+		        headers.add("Content-Type", "application/problem+json");
+		        headers.add("Content-Language", "en");
+		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 	
 	//works
