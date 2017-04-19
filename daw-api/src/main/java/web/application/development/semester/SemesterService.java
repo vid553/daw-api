@@ -42,4 +42,5 @@ public class SemesterService {
 	public void removePredmetFromSemester(String id, Semester semester) {
 		semesterRepository.save(semester);
 	}
+	
 }

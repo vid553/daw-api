@@ -11,7 +11,7 @@ import javax.persistence.PreRemove;
 import web.application.development.predavanje.Predavanje;
 
 @Entity 
-public class Student{
+public class Student {
 
 	@Id	//primary key
 	private String id;

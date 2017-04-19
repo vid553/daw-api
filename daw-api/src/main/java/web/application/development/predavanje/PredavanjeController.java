@@ -1,5 +1,9 @@
 package web.application.development.predavanje;
 
+import static web.application.development.predavanje.PredavanjeComparator.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.json.JsonObject;
@@ -145,5 +149,38 @@ public class PredavanjeController {
 		Predavanje temp = predavanjeService.getPredavanje(predavanjeId);
 		temp.removeTeam(new Team(teamId, "", 0));
 		predavanjeService.removeTeamfromPredavanje(predavanjeId, temp);
+	}
+	
+	//sort parameters are ID_SORT, IDENTIFIER_SORT
+	@RequestMapping(value="/classes/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	public ResponseEntity<Entity> getSortedPredavanjaDescending(@PathVariable List<String> sortParameter) {
+		List<Predavanje> predavanja = predavanjeService.getAllPredavanje();
+		
+		List<PredavanjeComparator> comparators = new ArrayList<>();
+		for (String s : sortParameter) {
+			comparators.add(PredavanjeComparator.valueOf(s));
+		}
+		Collections.sort(predavanja, descending(getComparator(comparators)));
+		
+		JsonObject object = formatter.ReturnJSON(predavanja, new Predavanje());
+		EntityReader entityReader = Siren.createEntityReader();
+		Entity entity = entityReader.read(object);
+		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/classes/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	public ResponseEntity<Entity> getSortedPredavanjaAscending(@PathVariable List<String> sortParameter) {
+		List<Predavanje> predavanja = predavanjeService.getAllPredavanje();
+		
+		List<PredavanjeComparator> comparators = new ArrayList<>();
+		for (String s : sortParameter) {
+			comparators.add(PredavanjeComparator.valueOf(s));
+		}
+		Collections.sort(predavanja, ascending(getComparator(comparators)));
+		
+		JsonObject object = formatter.ReturnJSON(predavanja, new Predavanje());
+		EntityReader entityReader = Siren.createEntityReader();
+		Entity entity = entityReader.read(object);
+		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 }
