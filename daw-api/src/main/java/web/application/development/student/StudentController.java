@@ -21,6 +21,7 @@ import com.sebastian_daschner.siren4javaee.Entity;
 import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
+import web.application.develeopment.headers.Headers;
 import web.application.development.exception.Error;
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
@@ -37,6 +38,8 @@ public class StudentController {
 	@Autowired
 	private Formatter formatter;
 	
+	private HttpHeaders sirenHeader = Headers.SirenHeader();
+	
 	//works empty or with added entities, if non-existing class -> returns 404
 	@RequestMapping(value="/students", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<?> getAllStudents() {
@@ -49,7 +52,7 @@ public class StudentController {
 				JsonObject object = formatter.ReturnJSON(students, new Student());
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);
-				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
 				String errorMessage = ex + "";
@@ -72,7 +75,7 @@ public class StudentController {
 				JsonObject object = formatter.ReturnJSON(student);
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);
-				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
 				String errorMessage = ex + "";
