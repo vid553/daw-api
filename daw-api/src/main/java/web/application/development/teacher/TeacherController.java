@@ -1,5 +1,9 @@
 package web.application.development.teacher;
 
+import static web.application.development.teacher.TeacherComparator.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.json.JsonObject;
@@ -101,5 +105,37 @@ public class TeacherController {
 		teacherService.removeCourseFromTeacher(teacherId, temp);
 	}
 	
-
+	//sort parameters are NAME_SORT, ID_SORT, NUMBER_SORT, EMAIL_SORT
+	@RequestMapping(value="/teachers/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	public ResponseEntity<Entity> getSortedTeachersDescending(@PathVariable List<String> sortParameter) {
+		List<Teacher> teachers = new ArrayList<>();
+		
+		List<TeacherComparator> comparators = new ArrayList<>();
+		for (String s : sortParameter) {
+			comparators.add(TeacherComparator.valueOf(s));
+		}
+		Collections.sort(teachers, descending(getComparator(comparators)));
+		
+		JsonObject object = formatter.ReturnJSON(teachers, new Teacher());
+		EntityReader entityReader = Siren.createEntityReader();
+		Entity entity = entityReader.read(object);
+		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+	}
+	
+	//sort parameters are NAME_SORT, ID_SORT, NUMBER_SORT, EMAIL_SORT
+	@RequestMapping(value="/teachers/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	public ResponseEntity<Entity> getSortedTeachersAscending(@PathVariable List<String> sortParameter) {
+		List<Teacher> teachers = new ArrayList<>();
+		
+		List<TeacherComparator> comparators = new ArrayList<>();
+		for (String s : sortParameter) {
+			comparators.add(TeacherComparator.valueOf(s));
+		}
+		Collections.sort(teachers, ascending(getComparator(comparators)));
+		
+		JsonObject object = formatter.ReturnJSON(teachers, new Teacher());
+		EntityReader entityReader = Siren.createEntityReader();
+		Entity entity = entityReader.read(object);
+		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+	}
 }

@@ -1,5 +1,9 @@
 package web.application.development.course;
 
+import static web.application.development.course.CourseComparator.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.json.JsonObject;
@@ -21,7 +25,6 @@ import com.sebastian_daschner.siren4javaee.Siren;
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
-import web.application.development.teacher.TeacherService;
 
 @RestController
 public class CourseController {
@@ -89,5 +92,38 @@ public class CourseController {
 		Course temp = courseService.getCourse(courseId);
 		temp.removeClass(new Predavanje(classId, "", false));
 		courseService.removeClassFromCourse(courseId, temp);
+	}
+	
+	//sort parameters are NAME_SORT, ID_SORT, ACRONIM_SORT
+	@RequestMapping(value="/courses/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	public ResponseEntity<Entity> getSortedCoursesDescending(@PathVariable List<String> sortParameter) {
+		List<Course> courses = new ArrayList<>();
+		
+		List<CourseComparator> comparators = new ArrayList<>();
+		for (String s : sortParameter) {
+			comparators.add(CourseComparator.valueOf(s));
+		}
+		Collections.sort(courses, descending(getComparator(comparators)));
+		
+		JsonObject object = formatter.ReturnJSON(courses, new Course());
+		EntityReader entityReader = Siren.createEntityReader();
+		Entity entity = entityReader.read(object);
+		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/courses/sort/Ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	public ResponseEntity<Entity> getSortedCoursesAscending(@PathVariable List<String> sortParameter) {
+		List<Course> courses = new ArrayList<>();
+		
+		List<CourseComparator> comparators = new ArrayList<>();
+		for (String s : sortParameter) {
+			comparators.add(CourseComparator.valueOf(s));
+		}
+		Collections.sort(courses, ascending(getComparator(comparators)));
+		
+		JsonObject object = formatter.ReturnJSON(courses, new Course());
+		EntityReader entityReader = Siren.createEntityReader();
+		Entity entity = entityReader.read(object);
+		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 }
