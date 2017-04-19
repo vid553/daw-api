@@ -47,4 +47,7 @@ public class TeacherService {
 		teacherRepository.save(teacher);
 	}
 	
+	public Teacher getTeacherByName(String name) {
+		return teacherRepository.findByName(name);
+	}
 }

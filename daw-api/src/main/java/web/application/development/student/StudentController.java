@@ -91,7 +91,7 @@ public class StudentController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
 	//works
 	@RequestMapping(value="/students", method=RequestMethod.POST)
 	public void addStudent(@RequestBody Student student) { //@RequestBody tells spring that the request pay load is going to contain a user
