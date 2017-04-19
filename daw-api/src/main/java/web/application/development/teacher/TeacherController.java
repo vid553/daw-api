@@ -10,6 +10,7 @@ import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +25,7 @@ import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.course.Course;
 import web.application.development.course.CourseService;
+import web.application.development.exception.Error;
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
@@ -40,21 +42,70 @@ public class TeacherController {
 	@Autowired
 	private Formatter formatter;
 	
+	//works if teacher exists, if non-existing class -> returns 404
 	@RequestMapping(value="/teachers", method=RequestMethod.GET) //maps URL /teachers to method getAllTeachers
-	public ResponseEntity<Entity> getAllTeachers() {
-		JsonObject object = formatter.ReturnJSON(teacherService.getAllTeachers(), new Teacher());
-		EntityReader entityReader = Siren.createEntityReader();
-		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+	public ResponseEntity<?> getAllTeachers() {
+		List<Teacher> teachers = teacherService.getAllTeachers();
+		if (teachers.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		else {
+			try {
+				JsonObject object = formatter.ReturnJSON(teachers, new Teacher());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
+				HttpHeaders headers = new HttpHeaders();
+		        headers.add("Content-Type", "application/problem+json");
+		        headers.add("Content-Language", "en");
+		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
 	}
 	
+	//works if teacher exists, if non-existing class -> returns 404
 	@RequestMapping(value="/teachers/{teacherId}", method=RequestMethod.GET)
-	public HttpEntity<Entity> getTeacher(@PathVariable String teacherId) {
+	public HttpEntity<?> getTeacher(@PathVariable String teacherId) {
 		Teacher teacher = teacherService.getTeacher(teacherId);
-		JsonObject object = formatter.ReturnJSON(teacher);
-		EntityReader entityReader = Siren.createEntityReader();
-		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		if (teacher != null) {
+			try {
+				JsonObject object = formatter.ReturnJSON(teacher);
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
+		        HttpHeaders headers = new HttpHeaders();
+		        headers.add("Content-Type", "application/problem+json");
+		        headers.add("Content-Language", "en");
+		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 	
 	@RequestMapping(value="/teachers", method=RequestMethod.POST)

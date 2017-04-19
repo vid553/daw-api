@@ -9,6 +9,7 @@ import java.util.List;
 import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import com.sebastian_daschner.siren4javaee.Entity;
 import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
+import web.application.development.exception.Error;
 import web.application.development.formatter.Formatter;
 import web.application.development.student.Student;
 
@@ -33,24 +35,56 @@ public class TeamController {
 	@Autowired
 	private Formatter formatter;
 	
-	//works if team exists, TODO: handle non-existing team, returns 500, should return 404
+	//works, if non-existing class -> returns 404
 	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.GET) //maps URL /groups to method getAllGroups
-	public ResponseEntity<Entity> getGroup(@PathVariable String groupId) {
+	public ResponseEntity<?> getGroup(@PathVariable String groupId) {
 		Team group = groupService.getGroup(groupId);
-		JsonObject object = formatter.ReturnJSON(group);
-		EntityReader entityReader = Siren.createEntityReader();
-		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
-		//return groupService.getGroup(groupId);
+		if (group != null) {
+			try {
+				JsonObject object = formatter.ReturnJSON(group);
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+		        HttpHeaders headers = new HttpHeaders();
+		        headers.add("Content-Type", "application/problem+json");
+		        headers.add("Content-Language", "en");
+		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 	
-	//works
+	//works, if non-existing class -> returns 404
 	@RequestMapping(value="/groups", method=RequestMethod.GET) //maps URL /groups to method getAllGroups
-	public ResponseEntity<Entity> getAllGroups() {
-		JsonObject object = formatter.ReturnJSON(groupService.getAllGroups(), new Team());
-		EntityReader entityReader = Siren.createEntityReader();
-		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+	public ResponseEntity<?> getAllGroups() {
+		List<Team> group = groupService.getAllGroups();
+		if (group.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		else {
+			try {
+				JsonObject object = formatter.ReturnJSON(group, new Team());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+		        HttpHeaders headers = new HttpHeaders();
+		        headers.add("Content-Type", "application/problem+json");
+		        headers.add("Content-Language", "en");
+		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
 	}
 	
 	//works

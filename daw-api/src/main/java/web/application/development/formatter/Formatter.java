@@ -13,7 +13,6 @@ import com.sebastian_daschner.siren4javaee.Siren;
 import web.application.development.teacher.Teacher;
 import web.application.development.team.Team;
 import web.application.development.student.Student;
-
 import web.application.development.course.Course;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.semester.Semester;
@@ -103,8 +102,7 @@ public class Formatter {
 			studentEntity.addEntity(ReturnJSON(p, new Student()));
 		}
 		
-			    studentEntity.addLink(URI.create(Uri), "self");
-
+	  studentEntity.addLink(URI.create(Uri), "self");
 		return studentEntity.build();
 	}
 	
