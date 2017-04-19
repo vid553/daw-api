@@ -54,6 +54,7 @@ public class TeacherController {
 				JsonObject object = formatter.ReturnJSON(teachers, new Teacher());
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);
+
 				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 			}
 			catch (Exception ex) {
