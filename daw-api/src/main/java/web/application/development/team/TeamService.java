@@ -49,4 +49,8 @@ public class TeamService {
 		groupRepository.save(group);
 	}
 	
+	public Team getGroupByName(String name) {
+		return groupRepository.findByName(name);
+	}
+	
 }

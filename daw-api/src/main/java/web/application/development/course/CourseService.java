@@ -42,4 +42,8 @@ public class CourseService {
 	public void removeClassFromCourse(String id, Course course) {
 		courseRepository.save(course);
 	}
+	
+	public Course getCourseByName(String name) {
+		return courseRepository.findByName(name);
+	}
 }

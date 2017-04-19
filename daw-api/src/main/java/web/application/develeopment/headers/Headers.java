@@ -11,5 +11,13 @@ public class Headers {
 	    
 	    return header;
 	}
+	
+	public static HttpHeaders ProblemHeader() {
+        HttpHeaders header = new HttpHeaders();
+        header.add("Content-Type", "application/problem+json");
+        header.add("Content-Language", "en");
+        
+        return header;
+	}
 
 }

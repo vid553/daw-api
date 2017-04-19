@@ -50,4 +50,8 @@ public class PredavanjeService {
 	public void assignTeacherToClass(String id, Predavanje predmet) {
 		predmetRepository.save(predmet);
 	}
+	
+	public Predavanje getPredavanjeByIdentifier(String identifier) {
+		return predmetRepository.findByIdentifier(identifier);
+	}
 }
