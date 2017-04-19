@@ -55,7 +55,14 @@ public class CourseController {
 			catch (Exception ex) {
 				String errorMessage = ex + "";
 				String[] errorsInfo = errorMessage.split(": ");
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
 		        HttpHeaders headers = new HttpHeaders();
 		        headers.add("Content-Type", "application/problem+json");
 		        headers.add("Content-Language", "en");
@@ -78,7 +85,14 @@ public class CourseController {
 			catch (Exception ex) {
 				String errorMessage = ex + "";
 				String[] errorsInfo = errorMessage.split(": ");
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
 		        HttpHeaders headers = new HttpHeaders();
 		        headers.add("Content-Type", "application/problem+json");
 		        headers.add("Content-Language", "en");
