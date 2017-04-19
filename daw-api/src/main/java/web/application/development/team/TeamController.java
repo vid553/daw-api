@@ -1,5 +1,9 @@
 package web.application.development.team;
 
+import static web.application.development.team.TeamComparator.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.json.JsonObject;
@@ -118,6 +122,39 @@ public class TeamController {
 		Team temp = groupService.getGroup(groupId);
 		temp.removeStudent(new Student(studentId, "","",""));
 		groupService.removeStundentFromGroup(groupId, temp);
+	}
+	
+	//sort parameters are NAME_SORT, ID_SORT
+	@RequestMapping(value="/groups/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	public ResponseEntity<Entity> getSortedGroupsDescending(@PathVariable List<String> sortParameter) {
+		List<Team> groups = new ArrayList<>();
+		
+		List<TeamComparator> comparators = new ArrayList<>();
+		for (String s : sortParameter) {
+			comparators.add(TeamComparator.valueOf(s));
+		}
+		Collections.sort(groups, descending(getComparator(comparators)));
+		
+		JsonObject object = formatter.ReturnJSON(groups, new Team());
+		EntityReader entityReader = Siren.createEntityReader();
+		Entity entity = entityReader.read(object);
+		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/groups/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	public ResponseEntity<Entity> getSortedGroupsAscending(@PathVariable List<String> sortParameter) {
+		List<Team> groups = new ArrayList<>();
+		
+		List<TeamComparator> comparators = new ArrayList<>();
+		for (String s : sortParameter) {
+			comparators.add(TeamComparator.valueOf(s));
+		}
+		Collections.sort(groups, ascending(getComparator(comparators)));
+		
+		JsonObject object = formatter.ReturnJSON(groups, new Team());
+		EntityReader entityReader = Siren.createEntityReader();
+		Entity entity = entityReader.read(object);
+		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 
 }

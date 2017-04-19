@@ -1,5 +1,7 @@
 package web.application.development.student;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.json.JsonObject;
@@ -23,6 +25,7 @@ import web.application.development.exception.Error;
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
+import static web.application.development.student.StudentComparator.*;
 
 @RestController
 public class StudentController {
@@ -114,6 +117,39 @@ public class StudentController {
 		Predavanje predmet = predmetService.getPredavanje(classId);
 		predmet.enrollIntoClass(new Student(id, "","",""));
 		predmetService.enrollStudentIntoClass(classId, predmet);
+	}
+	
+	//sort parameters are NAME_SORT, ID_SORT, NUMBER_SORT, EMAIL_SORT
+	@RequestMapping(value="/students/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	public ResponseEntity<Entity> getSortedStudentsDescending(@PathVariable List<String> sortParameter) {
+		List<Student> students = studentService.getAllStudents();
+		
+		List<StudentComparator> comparators = new ArrayList<>();
+		for (String s : sortParameter) {
+			comparators.add(StudentComparator.valueOf(s));
+		}
+		Collections.sort(students, descending(getComparator(comparators)));
+		
+		JsonObject object = formatter.ReturnJSON(students, new Student());
+		EntityReader entityReader = Siren.createEntityReader();
+		Entity entity = entityReader.read(object);
+		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/students/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	public ResponseEntity<Entity> getSortedStudentsAscendign(@PathVariable List<String> sortParameter) {
+		List<Student> students = studentService.getAllStudents();
+		
+		List<StudentComparator> comparators = new ArrayList<>();
+		for (String s : sortParameter) {
+			comparators.add(StudentComparator.valueOf(s));
+		}
+		Collections.sort(students, ascending(getComparator(comparators)));
+		
+		JsonObject object = formatter.ReturnJSON(students, new Student());
+		EntityReader entityReader = Siren.createEntityReader();
+		Entity entity = entityReader.read(object);
+		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 
 	//when trying to delete student, while student is in group, returns error 500, TODO: handle error

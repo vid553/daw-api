@@ -22,7 +22,7 @@ public class Teacher{
 	private String number;
 	private Boolean admin;
 	
-	@OneToMany
+	@OneToMany(targetEntity = Course.class)
 	private List<Course> courses;
 
 	@ManyToMany(targetEntity = Predavanje.class)
