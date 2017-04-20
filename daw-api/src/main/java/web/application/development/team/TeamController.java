@@ -24,7 +24,9 @@ import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.exception.Error;
 import web.application.development.formatter.Formatter;
+import web.application.development.predavanje.Predavanje;
 import web.application.development.student.Student;
+import web.application.development.student.StudentService;
 
 
 @RestController
@@ -32,6 +34,8 @@ public class TeamController {
 	
 	@Autowired //marks this as something that needs dependency injection, injects existing groupService
 	private TeamService groupService;
+	@Autowired
+	private StudentService studentService;
 	@Autowired
 	private Formatter formatter;
 	
@@ -49,7 +53,14 @@ public class TeamController {
 			catch (Exception ex) {
 				String errorMessage = ex + "";
 				String[] errorsInfo = errorMessage.split(": ");
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
 		        HttpHeaders headers = new HttpHeaders();
 		        headers.add("Content-Type", "application/problem+json");
 		        headers.add("Content-Language", "en");
@@ -78,7 +89,14 @@ public class TeamController {
 			catch (Exception ex) {
 				String errorMessage = ex + "";
 				String[] errorsInfo = errorMessage.split(": ");
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
 		        HttpHeaders headers = new HttpHeaders();
 		        headers.add("Content-Type", "application/problem+json");
 		        headers.add("Content-Language", "en");
@@ -110,18 +128,43 @@ public class TeamController {
 	
 	//works
 	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
-	public void addStudentToGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	public ResponseEntity<?> addStudentToGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Team group = groupService.getGroup(groupId);
-		group.addStudent(new Student(studentId, "","",""));
-		groupService.addStudentToGroup(groupId, group);
+		Student student = studentService.getStudent(studentId);
+		List<Predavanje> predavanja = student.getClasses();
+		if (predavanja.contains(group.getPredavanje())) {
+			List<Student> students = group.getStudents();
+			if (students.size() < group.getStudents_limit()) {
+				group.addStudent(new Student(studentId, "","",""));
+				groupService.addStudentToGroup(groupId, group);
+				return new ResponseEntity<>(HttpStatus.OK);
+			}
+			else {
+		        Error error = new Error("http://localhost:8080/error/permision", "The group is full.", "The group has reached its limit of " + group.getStudents_limit() + " students.");
+		        HttpHeaders headers = new HttpHeaders();
+		        headers.add("Content-Type", "application/problem+json");
+		        headers.add("Content-Language", "en");
+		        return new ResponseEntity<Error>(error, headers, HttpStatus.FORBIDDEN);
+			}
+		}
+		else {
+			Error error = new Error("http://localhost:8080/error/permision", "Student not enrolled in the class.", "The requested student is not enrolled in required class.");
+	       	HttpHeaders headers = new HttpHeaders();
+	        headers.add("Content-Type", "application/problem+json");
+	        headers.add("Content-Language", "en");
+	        return new ResponseEntity<Error>(error, headers, HttpStatus.FORBIDDEN);
+		}
 	}
 
 	//works
 	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.DELETE) //removes student from group
-	public void remveStudentFromGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	public void removeStudentFromGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Team temp = groupService.getGroup(groupId);
 		temp.removeStudent(new Student(studentId, "","",""));
 		groupService.removeStundentFromGroup(groupId, temp);
+		if (temp.getStudents().isEmpty()) {	// if the last student leaves, the group gets deleted
+			groupService.deleteGroup(groupId);
+		}
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT
