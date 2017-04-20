@@ -43,7 +43,7 @@ public class TeacherController {
 	private Formatter formatter;
 	
 	//works if teacher exists, if non-existing class -> returns 404
-	@RequestMapping(value="/teachers", method=RequestMethod.GET, produces = "application/json") //maps URL /teachers to method getAllTeachers
+	@RequestMapping(value="/teachers", method=RequestMethod.GET) //maps URL /teachers to method getAllTeachers
 	public ResponseEntity<?> getAllTeachers() {
 		List<Teacher> teachers = teacherService.getAllTeachers();
 		if (teachers.isEmpty()) {
@@ -77,7 +77,7 @@ public class TeacherController {
 	}
 	
 	//works if teacher exists, if non-existing class -> returns 404
-	@RequestMapping(value="/teachers/{teacherId}", method=RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value="/teachers/{teacherId}", method=RequestMethod.GET)
 	public HttpEntity<?> getTeacher(@PathVariable String teacherId) {
 		Teacher teacher = teacherService.getTeacher(teacherId);
 		if (teacher != null) {
@@ -109,12 +109,12 @@ public class TeacherController {
 		}
 	}
 	
-	@RequestMapping(value="/teachers", method=RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value="/teachers", method=RequestMethod.POST)
 	public void addUser(@RequestBody Teacher teacher) { //@RequestBody tells spring that the request pay load is going to contain a user
 		teacherService.addTeacher(teacher);
 	}
 	
-	@RequestMapping(value="/teachers/{teacherId}/{courseId}", method=RequestMethod.POST, produces = "application/json") //adds existing student to group, NO BODY on POST
+	@RequestMapping(value="/teachers/{teacherId}/{courseId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
 	public void addStudentToGroup(@PathVariable String teacherId, @PathVariable String courseId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Teacher teacher = teacherService.getTeacher(teacherId);
 		teacher.addCourse(new Course(courseId, "",""));
@@ -125,7 +125,7 @@ public class TeacherController {
 		courseService.updateCourse(courseId, course);
 	}
 	
-	@RequestMapping(value="/teachers/{teacherId}/classes/{classId}", method=RequestMethod.POST, produces = "application/json") //adds existing student to group, NO BODY on POST
+	@RequestMapping(value="/teachers/{teacherId}/classes/{classId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
 	public void assignTeacherToClass(@PathVariable String teacherId, @PathVariable String classId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Teacher teacher = teacherService.getTeacher(teacherId);
 		teacher.assignTeacherToClass(new Predavanje(classId, "",false));
@@ -136,7 +136,7 @@ public class TeacherController {
 		predmetService.assignTeacherToClass(classId, predmet);
 	}
 
-	@RequestMapping(value="/teachers/{teacherId}", method=RequestMethod.PUT, produces = "application/json")
+	@RequestMapping(value="/teachers/{teacherId}", method=RequestMethod.PUT)
 	public void updateUser(@RequestBody Teacher teacher, @PathVariable String teacherId) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Teacher temp = teacherService.getTeacher(teacherId);
 		List<Course> courses = temp.getCourses();
@@ -144,12 +144,12 @@ public class TeacherController {
 		teacherService.updateTeacher(teacherId, teacher);
 	}
 	
-	@RequestMapping(value="/teachers/{teacherId}", method=RequestMethod.DELETE, produces = "application/json")
+	@RequestMapping(value="/teachers/{teacherId}", method=RequestMethod.DELETE)
 	public void deleteUser(@PathVariable String teacherId) {
 		teacherService.deleteTeacher(teacherId);
 	}
 	
-	@RequestMapping(value="/teachers/{teacherId}/{courseId}", method=RequestMethod.DELETE, produces = "application/json") //removes course from teacher, body has to have course ID
+	@RequestMapping(value="/teachers/{teacherId}/{courseId}", method=RequestMethod.DELETE) //removes course from teacher, body has to have course ID
 	public void remveStudentFromGroup(@PathVariable String courseId, @PathVariable String teacherId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Teacher temp = teacherService.getTeacher(teacherId);
 		//Course course = new Course(courseId, "","");
@@ -158,7 +158,7 @@ public class TeacherController {
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT, NUMBER_SORT, EMAIL_SORT
-	@RequestMapping(value="/teachers/sort/descending/{sortParameter}", method=RequestMethod.GET, produces = "application/json") //maps URL /students to method getAllStudents
+	@RequestMapping(value="/teachers/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedTeachersDescending(@PathVariable List<String> sortParameter) {
 		List<Teacher> teachers = new ArrayList<>();
 		
@@ -175,7 +175,7 @@ public class TeacherController {
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT, NUMBER_SORT, EMAIL_SORT
-	@RequestMapping(value="/teachers/sort/ascending/{sortParameter}", method=RequestMethod.GET, produces = "application/json") //maps URL /students to method getAllStudents
+	@RequestMapping(value="/teachers/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedTeachersAscending(@PathVariable List<String> sortParameter) {
 		List<Teacher> teachers = new ArrayList<>();
 		

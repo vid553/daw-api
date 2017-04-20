@@ -36,7 +36,7 @@ public class TeamController {
 	private Formatter formatter;
 	
 	//works, if non-existing class -> returns 404
-	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.GET, produces = "application/json") //maps URL /groups to method getAllGroups
+	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.GET) //maps URL /groups to method getAllGroups
 	public ResponseEntity<?> getGroup(@PathVariable String groupId) {
 		Team group = groupService.getGroup(groupId);
 		if (group != null) {
@@ -62,7 +62,7 @@ public class TeamController {
 	}
 	
 	//works, if non-existing class -> returns 404
-	@RequestMapping(value="/groups", method=RequestMethod.GET, produces = "application/json") //maps URL /groups to method getAllGroups
+	@RequestMapping(value="/groups", method=RequestMethod.GET) //maps URL /groups to method getAllGroups
 	public ResponseEntity<?> getAllGroups() {
 		List<Team> group = groupService.getAllGroups();
 		if (group.isEmpty()) {
@@ -88,13 +88,13 @@ public class TeamController {
 	}
 	
 	//works
-	@RequestMapping(value="/groups", method=RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value="/groups", method=RequestMethod.POST)
 	public void addGroup(@RequestBody Team group) { //@RequestBody tells spring that the request pay load is going to contain a course
 		groupService.addGroup(group);
 	}
 
 	//works
-	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.PUT, produces = "application/json") //change group info
+	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.PUT) //change group info
 	public void updateGroup(@RequestBody Team group, @PathVariable String groupId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Team temp = groupService.getGroup(groupId);
 		List<Student> students = temp.getStudents();
@@ -103,13 +103,13 @@ public class TeamController {
 	}
 	
 	//works
-	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.DELETE, produces = "application/json") //delete group
+	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.DELETE) //delete group
 	public void deleteGroup(@PathVariable String groupId) {
 		groupService.deleteGroup(groupId);
 	}
 	
 	//works
-	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.POST, produces = "application/json") //adds existing student to group, NO BODY on POST
+	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
 	public void addStudentToGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Team group = groupService.getGroup(groupId);
 		group.addStudent(new Student(studentId, "","",""));
@@ -117,7 +117,7 @@ public class TeamController {
 	}
 
 	//works
-	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.DELETE, produces = "application/json") //removes student from group
+	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.DELETE) //removes student from group
 	public void remveStudentFromGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Team temp = groupService.getGroup(groupId);
 		temp.removeStudent(new Student(studentId, "","",""));
@@ -125,7 +125,7 @@ public class TeamController {
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT
-	@RequestMapping(value="/groups/sort/descending/{sortParameter}", method=RequestMethod.GET, produces = "application/json") //maps URL /students to method getAllStudents
+	@RequestMapping(value="/groups/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedGroupsDescending(@PathVariable List<String> sortParameter) {
 		List<Team> groups = new ArrayList<>();
 		
@@ -141,7 +141,7 @@ public class TeamController {
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/groups/sort/ascending/{sortParameter}", method=RequestMethod.GET, produces = "application/json") //maps URL /students to method getAllStudents
+	@RequestMapping(value="/groups/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedGroupsAscending(@PathVariable List<String> sortParameter) {
 		List<Team> groups = new ArrayList<>();
 		

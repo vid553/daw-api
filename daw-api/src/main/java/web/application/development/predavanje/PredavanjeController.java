@@ -39,7 +39,7 @@ public class PredavanjeController {
 	private Formatter formatter;
 	
 	//works, if non-existing class -> returns 404
-	@RequestMapping(value="/classes", method=RequestMethod.GET, produces = "application/json") //maps URL /predmeti to method getAllPredmeti
+	@RequestMapping(value="/classes", method=RequestMethod.GET) //maps URL /predmeti to method getAllPredmeti
 	public ResponseEntity<?> getAllPredmeti() {
 		List<Predavanje> predavanja = predavanjeService.getAllPredavanje();
 		if (predavanja.isEmpty()) {
@@ -72,7 +72,7 @@ public class PredavanjeController {
 	}
 	
 	//works if class exists, if non-existing class -> returns 404
-	@RequestMapping(value="/classes/{id}", method=RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value="/classes/{id}", method=RequestMethod.GET)
 	public HttpEntity<?> getPredavanje(@PathVariable String id) {
 		Predavanje predmet = predavanjeService.getPredavanje(id);
 		if (predmet != null) {
@@ -104,7 +104,7 @@ public class PredavanjeController {
 	}
 	
 	//doesnt work if uri contains special characters
-	@RequestMapping(value="/classes", method=RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value="/classes", method=RequestMethod.POST)
 	public void addPredavanje(@RequestBody Predavanje predmet) { //@RequestBody tells spring that the request pay load is going to contain a user
 		predavanjeService.addPredavanje(predmet);
 	}
@@ -117,7 +117,7 @@ public class PredavanjeController {
 	 */
 	
 	//works
-	@RequestMapping(value="/classes/{id}", method=RequestMethod.PUT, produces = "application/json")
+	@RequestMapping(value="/classes/{id}", method=RequestMethod.PUT)
 	public void updatePredavanje(@RequestBody Predavanje predmet, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Predavanje temp = predavanjeService.getPredavanje(id);
 		List<Team> teams = temp.getTeams();
@@ -126,7 +126,7 @@ public class PredavanjeController {
 	}
 
 	//works
-	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.POST)
 	public void addTeamToPredavanje(@PathVariable String predavanjeId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Predavanje predmet = predavanjeService.getPredavanje(predavanjeId);
 		predmet.addTeam(new Team(teamId,"",0));
@@ -138,13 +138,13 @@ public class PredavanjeController {
 	}
 	
 	//works
-	@RequestMapping(value="/classes/{id}", method=RequestMethod.DELETE, produces = "application/json")
+	@RequestMapping(value="/classes/{id}", method=RequestMethod.DELETE)
 	public void deletePredmet(@PathVariable String id) {
 		predavanjeService.deletePredavanje(id);
 	}
 	
 	//works
-	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.DELETE, produces = "application/json")
+	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.DELETE)
 	public void removeTeamFromPredmet(@PathVariable String predavanjeId, @PathVariable String teamId) {
 		Predavanje temp = predavanjeService.getPredavanje(predavanjeId);
 		temp.removeTeam(new Team(teamId, "", 0));
@@ -152,7 +152,7 @@ public class PredavanjeController {
 	}
 	
 	//sort parameters are ID_SORT, IDENTIFIER_SORT
-	@RequestMapping(value="/classes/sort/descending/{sortParameter}", method=RequestMethod.GET, produces = "application/json") //maps URL /students to method getAllStudents
+	@RequestMapping(value="/classes/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedPredavanjaDescending(@PathVariable List<String> sortParameter) {
 		List<Predavanje> predavanja = predavanjeService.getAllPredavanje();
 		
@@ -168,7 +168,7 @@ public class PredavanjeController {
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/classes/sort/ascending/{sortParameter}", method=RequestMethod.GET, produces = "application/json") //maps URL /students to method getAllStudents
+	@RequestMapping(value="/classes/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedPredavanjaAscending(@PathVariable List<String> sortParameter) {
 		List<Predavanje> predavanja = predavanjeService.getAllPredavanje();
 		
