@@ -50,7 +50,7 @@ public class CourseController {
 	})
 	
 	//works, if non-existing class -> returns 404
-	@RequestMapping(value="/courses", method=RequestMethod.GET) //maps URL /courses to method getAllCourses
+	@RequestMapping(value="/courses", method=RequestMethod.GET, produces="application/vnd.siren+json") //maps URL /courses to method getAllCourses
 	public ResponseEntity<?> getAllCourses() {
 		List<Course> courses = courseService.getAllCourses();
 		if (courses.isEmpty()) {
