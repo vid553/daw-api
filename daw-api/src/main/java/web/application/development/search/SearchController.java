@@ -1,7 +1,5 @@
 package web.application.development.search;
 
-import java.util.List;
-
 import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;

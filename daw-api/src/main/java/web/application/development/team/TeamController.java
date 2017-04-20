@@ -22,9 +22,12 @@ import com.sebastian_daschner.siren4javaee.Entity;
 import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
+import web.application.develeopment.headers.Headers;
 import web.application.development.exception.Error;
 import web.application.development.formatter.Formatter;
+import web.application.development.predavanje.Predavanje;
 import web.application.development.student.Student;
+import web.application.development.student.StudentService;
 
 
 @RestController
@@ -33,7 +36,12 @@ public class TeamController {
 	@Autowired //marks this as something that needs dependency injection, injects existing groupService
 	private TeamService groupService;
 	@Autowired
+	private StudentService studentService;
+	@Autowired
 	private Formatter formatter;
+	
+	private HttpHeaders sirenHeader = Headers.SirenHeader();
+	private HttpHeaders problemHeader = Headers.ProblemHeader();
 	
 	//works, if non-existing class -> returns 404
 	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.GET) //maps URL /groups to method getAllGroups
@@ -44,16 +52,20 @@ public class TeamController {
 				JsonObject object = formatter.ReturnJSON(group);
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);
-				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
 				String errorMessage = ex + "";
 				String[] errorsInfo = errorMessage.split(": ");
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
-		        HttpHeaders headers = new HttpHeaders();
-		        headers.add("Content-Type", "application/problem+json");
-		        headers.add("Content-Language", "en");
-		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("http://localhost:8080/error/server", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		else {
@@ -73,55 +85,82 @@ public class TeamController {
 				JsonObject object = formatter.ReturnJSON(group, new Team());
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);
-				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
 				String errorMessage = ex + "";
 				String[] errorsInfo = errorMessage.split(": ");
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
-		        HttpHeaders headers = new HttpHeaders();
-		        headers.add("Content-Type", "application/problem+json");
-		        headers.add("Content-Language", "en");
-		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("http://localhost:8080/error/server", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 	}
 	
 	//works
 	@RequestMapping(value="/groups", method=RequestMethod.POST)
-	public void addGroup(@RequestBody Team group) { //@RequestBody tells spring that the request pay load is going to contain a course
+	public ResponseEntity<?> addGroup(@RequestBody Team group) { //@RequestBody tells spring that the request pay load is going to contain a course
 		groupService.addGroup(group);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	//works
 	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.PUT) //change group info
-	public void updateGroup(@RequestBody Team group, @PathVariable String groupId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	public ResponseEntity<?> updateGroup(@RequestBody Team group, @PathVariable String groupId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Team temp = groupService.getGroup(groupId);
 		List<Student> students = temp.getStudents();
 		group.setStudents(students);
 		groupService.updateGroup(groupId, group);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
 	@RequestMapping(value="/groups/{groupId}", method=RequestMethod.DELETE) //delete group
-	public void deleteGroup(@PathVariable String groupId) {
+	public ResponseEntity<?> deleteGroup(@PathVariable String groupId) {
 		groupService.deleteGroup(groupId);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
 	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
-	public void addStudentToGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	public ResponseEntity<?> addStudentToGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Team group = groupService.getGroup(groupId);
-		group.addStudent(new Student(studentId, "","",""));
-		groupService.addStudentToGroup(groupId, group);
+		Student student = studentService.getStudent(studentId);
+		List<Predavanje> predavanja = student.getClasses();
+		if (predavanja.contains(group.getPredavanje())) {
+			List<Student> students = group.getStudents();
+			if (students.size() < group.getStudents_limit()) {
+				group.addStudent(new Student(studentId, "","",""));
+				groupService.addStudentToGroup(groupId, group);
+				return new ResponseEntity<>(HttpStatus.OK);
+			}
+			else {
+		        Error error = new Error("http://localhost:8080/error/permision", "The group is full.", "The group has reached its limit of " + group.getStudents_limit() + " students.");
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.FORBIDDEN);
+			}
+		}
+		else {
+			Error error = new Error("http://localhost:8080/error/permision", "Student not enrolled in the class.", "The requested student is not enrolled in required class.");
+	        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.FORBIDDEN);
+		}
 	}
 
 	//works
 	@RequestMapping(value="/groups/{groupId}/{studentId}", method=RequestMethod.DELETE) //removes student from group
-	public void remveStudentFromGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	public ResponseEntity<?> removeStudentFromGroup(@PathVariable String groupId, @PathVariable String studentId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Team temp = groupService.getGroup(groupId);
 		temp.removeStudent(new Student(studentId, "","",""));
 		groupService.removeStundentFromGroup(groupId, temp);
+		if (temp.getStudents().isEmpty()) {	// if the last student leaves, the group gets deleted
+			groupService.deleteGroup(groupId);
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT
@@ -138,7 +177,7 @@ public class TeamController {
 		JsonObject object = formatter.ReturnJSON(groups, new Team());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/groups/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
@@ -154,7 +193,7 @@ public class TeamController {
 		JsonObject object = formatter.ReturnJSON(groups, new Team());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 	}
 
 }

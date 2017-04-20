@@ -39,6 +39,7 @@ public class StudentController {
 	private Formatter formatter;
 	
 	private HttpHeaders sirenHeader = Headers.SirenHeader();
+	private HttpHeaders problemHeader = Headers.ProblemHeader();
 	
 	//works empty or with added entities, if non-existing class -> returns 404
 	@RequestMapping(value="/students", method=RequestMethod.GET) //maps URL /students to method getAllStudents
@@ -58,10 +59,7 @@ public class StudentController {
 				String errorMessage = ex + "";
 				String[] errorsInfo = errorMessage.split(": ");
 		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
-		        HttpHeaders headers = new HttpHeaders();
-		        headers.add("Content-Type", "application/problem+json");
-		        headers.add("Content-Language", "en");
-		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 	}
@@ -81,10 +79,7 @@ public class StudentController {
 				String errorMessage = ex + "";
 				String[] errorsInfo = errorMessage.split(": ");
 		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
-		        HttpHeaders headers = new HttpHeaders();
-		        headers.add("Content-Type", "application/problem+json");
-		        headers.add("Content-Language", "en");
-		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		else {
@@ -94,32 +89,46 @@ public class StudentController {
 
 	//works
 	@RequestMapping(value="/students", method=RequestMethod.POST)
-	public void addStudent(@RequestBody Student student) { //@RequestBody tells spring that the request pay load is going to contain a user
+	public ResponseEntity<?> addStudent(@RequestBody Student student) { //@RequestBody tells spring that the request pay load is going to contain a user
 		studentService.addStudent(student);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
 	@RequestMapping(value="/students/{id}", method=RequestMethod.PUT)
-	public void updateStudent(@RequestBody Student student, @PathVariable String id) { 
+	public ResponseEntity<?> updateStudent(@RequestBody Student student, @PathVariable String id) { 
 		studentService.updateStudent(id, student);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
 	@RequestMapping(value="/students/{id}", method=RequestMethod.DELETE)
-	public void deleteStudent(@PathVariable String id) {
+	public ResponseEntity<?> deleteStudent(@PathVariable String id) {
 		studentService.deleteStudent(id);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
 	@RequestMapping(value="/students/{id}/{classId}", method=RequestMethod.POST) 
-	public void enrollStudentToClass(@PathVariable String id, @PathVariable String classId) {
-		Student student = studentService.getStudent(id);
-		student.enrollIntoClass(new Predavanje(classId, "", false));
-		studentService.enrollStudentIntoClass(id, student);
-		
+	public ResponseEntity<?> enrollStudentToClass(@PathVariable String id, @PathVariable String classId) {
 		Predavanje predmet = predmetService.getPredavanje(classId);
-		predmet.enrollIntoClass(new Student(id, "","",""));
-		predmetService.enrollStudentIntoClass(classId, predmet);
+		if (predmet.getEnrolment()) {
+			predmet.enrollIntoClass(new Student(id, "","",""));
+			predmetService.enrollStudentIntoClass(classId, predmet);
+			Student student = studentService.getStudent(id);
+			student.enrollIntoClass(new Predavanje(classId, "", false));
+			studentService.enrollStudentIntoClass(id, student);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		else {
+			// TO DO: authentication needed, if not return error
+			Error error = new Error("http://localhost:8080/error/permision", "Can't join the class.", "This class does not have auto enrollment enabled. Only teachers can add students.");
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.add("Content-Type", "application/problem+json");
+	        headers.add("Content-Language", "en");
+	        return new ResponseEntity<Error>(error, headers, HttpStatus.FORBIDDEN);
+		}
+		
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT, NUMBER_SORT, EMAIL_SORT
@@ -136,7 +145,7 @@ public class StudentController {
 		JsonObject object = formatter.ReturnJSON(students, new Student());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/students/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
@@ -152,8 +161,6 @@ public class StudentController {
 		JsonObject object = formatter.ReturnJSON(students, new Student());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 	}
-
-	//when trying to delete student, while student is in group, returns error 500, TODO: handle error
 }
