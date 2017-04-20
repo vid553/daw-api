@@ -41,7 +41,7 @@ public class StudentController {
 	private HttpHeaders sirenHeader = Headers.SirenHeader();
 	
 	//works empty or with added entities, if non-existing class -> returns 404
-	@RequestMapping(value="/students", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	@RequestMapping(value="/students", method=RequestMethod.GET, produces = "application/json") //maps URL /students to method getAllStudents
 	public ResponseEntity<?> getAllStudents() {
 		List<Student> students = studentService.getAllStudents();
 		if (students.isEmpty()) {
@@ -67,7 +67,7 @@ public class StudentController {
 	}
 	
 	//works if student exists, if non-existing class -> returns 404
-	@RequestMapping(value="/students/{id}", method=RequestMethod.GET)
+	@RequestMapping(value="/students/{id}", method=RequestMethod.GET, produces = "application/json")
 	public HttpEntity<?> getStudent(@PathVariable String id) {
 		Student student = studentService.getStudent(id);
 		if (student != null) {
@@ -93,25 +93,25 @@ public class StudentController {
 	}
 
 	//works
-	@RequestMapping(value="/students", method=RequestMethod.POST)
+	@RequestMapping(value="/students", method=RequestMethod.POST, produces = "application/json")
 	public void addStudent(@RequestBody Student student) { //@RequestBody tells spring that the request pay load is going to contain a user
 		studentService.addStudent(student);
 	}
 	
 	//works
-	@RequestMapping(value="/students/{id}", method=RequestMethod.PUT)
+	@RequestMapping(value="/students/{id}", method=RequestMethod.PUT, produces = "application/json")
 	public void updateStudent(@RequestBody Student student, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
 		studentService.updateStudent(id, student);
 	}
 	
 	//works
-	@RequestMapping(value="/students/{id}", method=RequestMethod.DELETE)
+	@RequestMapping(value="/students/{id}", method=RequestMethod.DELETE, produces = "application/json")
 	public void deleteStudent(@PathVariable String id) {
 		studentService.deleteStudent(id);
 	}
 	
 	//works
-	@RequestMapping(value="/students/{id}/{classId}", method=RequestMethod.POST) 
+	@RequestMapping(value="/students/{id}/{classId}", method=RequestMethod.POST, produces = "application/json") 
 	public void enrollStudentToClass(@PathVariable String id, @PathVariable String classId) {
 		Student student = studentService.getStudent(id);
 		student.enrollIntoClass(new Predavanje(classId, "", false));
@@ -123,7 +123,7 @@ public class StudentController {
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT, NUMBER_SORT, EMAIL_SORT
-	@RequestMapping(value="/students/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	@RequestMapping(value="/students/sort/descending/{sortParameter}", method=RequestMethod.GET, produces = "application/json") //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedStudentsDescending(@PathVariable List<String> sortParameter) {
 		List<Student> students = studentService.getAllStudents();
 		
@@ -139,7 +139,7 @@ public class StudentController {
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/students/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	@RequestMapping(value="/students/sort/ascending/{sortParameter}", method=RequestMethod.GET, produces = "application/json") //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedStudentsAscendign(@PathVariable List<String> sortParameter) {
 		List<Student> students = studentService.getAllStudents();
 		
