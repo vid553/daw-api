@@ -50,7 +50,7 @@ public class CourseController {
 	})
 	
 	//works, if non-existing class -> returns 404
-	@RequestMapping(value="/courses", method=RequestMethod.GET, produces = "application/json") //maps URL /courses to method getAllCourses
+	@RequestMapping(value="/courses", method=RequestMethod.GET) //maps URL /courses to method getAllCourses
 	public ResponseEntity<?> getAllCourses() {
 		List<Course> courses = courseService.getAllCourses();
 		if (courses.isEmpty()) {
@@ -90,7 +90,7 @@ public class CourseController {
 	})
 	
 	//works if course exists, if non-existing class -> returns 404
-	@RequestMapping(value="/courses/{id}", method=RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value="/courses/{id}", method=RequestMethod.GET)
 	public HttpEntity<?> getCourse(@PathVariable String id) {
 		Course course = courseService.getCourse(id);
 		if (course != null) {
@@ -130,7 +130,7 @@ public class CourseController {
 	})
 	
 	//works
-	@RequestMapping(value="/courses", method=RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value="/courses", method=RequestMethod.POST)
 	public void addCourse(@RequestBody Course course) { //@RequestBody tells spring that the request pay load is going to contain a user
 		courseService.addCourse(course);
 	}
@@ -143,7 +143,7 @@ public class CourseController {
 	    @ApiResponse(code =  400, message ="Invalid input", response = errorCodesDoc.class)
 	})
 	
-	@RequestMapping(value="/courses/{courseId}/{classId}", method=RequestMethod.POST, produces = "application/json") //adds existing class to a course
+	@RequestMapping(value="/courses/{courseId}/{classId}", method=RequestMethod.POST) //adds existing class to a course
 	public void addClassToCourse(@PathVariable String classId, @PathVariable String courseId) {
 		Course course = courseService.getCourse(courseId);
 		course.addClass(new Predavanje(classId, "", false));
@@ -161,7 +161,7 @@ public class CourseController {
 	    @ApiResponse(code =  400, message ="Invalid input", response = errorCodesDoc.class)
 	})
 	
-	@RequestMapping(value="/courses/{courseId}", method=RequestMethod.PUT, produces = "application/json")
+	@RequestMapping(value="/courses/{courseId}", method=RequestMethod.PUT)
 	public void updateCourse(@RequestBody Course course, @PathVariable String courseId) {
 		Course temp = courseService.getCourse(courseId);
 		List<Predavanje> classes = temp.getClasses();
@@ -177,7 +177,7 @@ public class CourseController {
 	})
 	
 	//works
-	@RequestMapping(value="/courses/{id}", method=RequestMethod.DELETE, produces = "application/json")
+	@RequestMapping(value="/courses/{id}", method=RequestMethod.DELETE)
 	public void deleteCourse(@PathVariable String id) {
 		courseService.deleteCourse(id);
 	}
@@ -189,8 +189,8 @@ public class CourseController {
 	    @ApiResponse(code =  400, message ="Invalid input", response = errorCodesDoc.class)
 	})
 	
-	@RequestMapping(value="/courses/{courseId}/{classId}", method=RequestMethod.DELETE, produces = "application/json") //removes course from teacher, body has to have course ID
-	public void remveStudentFromGroup(@PathVariable String courseId, @PathVariable String classId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	@RequestMapping(value="/courses/{courseId}/{classId}", method=RequestMethod.DELETE) //removes course from teacher, body has to have course ID
+	public void remveStudentFromGroup(@PathVariable String courseId, @PathVariable String classId) {
 		Course temp = courseService.getCourse(courseId);
 		temp.removeClass(new Predavanje(classId, "", false));
 		courseService.removeClassFromCourse(courseId, temp);
@@ -204,7 +204,7 @@ public class CourseController {
 	})
 	
 	//sort parameters are NAME_SORT, ID_SORT, ACRONIM_SORT
-	@RequestMapping(value="/courses/sort/descending/{sortParameter}", method=RequestMethod.GET, produces = "application/json") //maps URL /students to method getAllStudents
+	@RequestMapping(value="/courses/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedCoursesDescending(@PathVariable List<String> sortParameter) {
 		List<Course> courses = new ArrayList<>();
 		
@@ -227,7 +227,7 @@ public class CourseController {
 	    @ApiResponse(code =  400, message ="Invalid input", response = errorCodesDoc.class)
 	})
 	
-	@RequestMapping(value="/courses/sort/Ascending/{sortParameter}", method=RequestMethod.GET, produces = "application/json") //maps URL /students to method getAllStudents
+	@RequestMapping(value="/courses/sort/Ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedCoursesAscending(@PathVariable List<String> sortParameter) {
 		List<Course> courses = new ArrayList<>();
 		
