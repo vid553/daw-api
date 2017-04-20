@@ -28,4 +28,9 @@ public class Error extends ResourceSupport {
 	public String getErrorDetail() {
 		return detail;
 	}
+	
+	public String toJSON() {
+		String json = "{\"type\":\"" + type + "\",\"title\":\"" + title + "\",\"detail\":\"" + detail + "\"}";
+		return json;
+	}
 }

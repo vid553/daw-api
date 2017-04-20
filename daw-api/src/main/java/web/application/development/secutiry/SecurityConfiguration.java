@@ -25,11 +25,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		/*http.csrf().disable()
+		 http.csrf().disable()
 		.authorizeRequests()
 		.antMatchers("/**").hasRole("TEACHER")
 		.and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
-        .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);*/
+        .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
 
 	@Bean
