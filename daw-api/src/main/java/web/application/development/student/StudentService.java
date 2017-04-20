@@ -19,8 +19,12 @@ public class StudentService {
 	}
 	
 	public Student getStudent(String id) {
-		//return topics.stream().filter(t -> t.getId().equals(id)).findFirst().get();
 		return studentRepository.findOne(id);
+	}
+	
+	public Student getStudentByName(String name) {
+		//return topics.stream().filter(t -> t.getId().equals(id)).findFirst().get();
+		return studentRepository.findByName(name);
 	}
 
 	public void addStudent(Student person) {
