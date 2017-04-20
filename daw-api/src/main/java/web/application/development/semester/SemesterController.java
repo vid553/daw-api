@@ -42,7 +42,7 @@ public class SemesterController {
 	private HttpHeaders problemHeader = Headers.ProblemHeader();
 	
 	//works, if non-existing class -> returns 404
-	@RequestMapping(value="/semesters", method=RequestMethod.GET) //maps URL /semesters to method getAllSemesters
+	@RequestMapping(value="/semesters", method=RequestMethod.GET, produces = "application/json") //maps URL /semesters to method getAllSemesters
 	public ResponseEntity<?> getAllSemesters() {
 		List<Semester> semesters = semesterService.getAllSemesters();
 		if (semesters.isEmpty()) {
@@ -65,7 +65,7 @@ public class SemesterController {
 	}
 	
 	//works if semester exists, if non-existing class -> returns 404
-	@RequestMapping(value="/semesters/{id}", method=RequestMethod.GET)
+	@RequestMapping(value="/semesters/{id}", method=RequestMethod.GET, produces = "application/json")
 	public HttpEntity<?> getSemester(@PathVariable String id) {
 		Semester semester = semesterService.getSemester(id);
 		if (semester != null) {
@@ -88,13 +88,13 @@ public class SemesterController {
 	}
 	
 	//works
-	@RequestMapping(value="/semesters", method=RequestMethod.POST)
+	@RequestMapping(value="/semesters", method=RequestMethod.POST, produces = "application/json")
 	public void addSemester(@RequestBody Semester semester) { //@RequestBody tells spring that the request pay load is going to contain a user
 		semesterService.addSemester(semester);
 	}
 	
 	//works
-	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.POST)
+	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.POST, produces = "application/json")
 	public void addPredmetToSemester(@PathVariable String semesterId, @PathVariable String predmetId) { 
 		Semester semester = semesterService.getSemester(semesterId);
 		semester.addPredmet(new Predavanje(predmetId, "", false));
@@ -106,7 +106,7 @@ public class SemesterController {
 	}
 	
 	//works
-	@RequestMapping(value="/semesters/{id}", method=RequestMethod.PUT)
+	@RequestMapping(value="/semesters/{id}", method=RequestMethod.PUT, produces = "application/json")
 	public void updateSemester(@RequestBody Semester semester, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
 		//System.out.println("TEST");
 		Semester temp = semesterService.getSemester(id);
@@ -116,13 +116,13 @@ public class SemesterController {
 	}
 	
 	//works
-	@RequestMapping(value="/semesters/{id}", method=RequestMethod.DELETE)
+	@RequestMapping(value="/semesters/{id}", method=RequestMethod.DELETE, produces = "application/json")
 	public void deleteSemester(@PathVariable String id) {
 		semesterService.deleteSemester(id);
 	}
 	
 	//works
-	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.DELETE) 
+	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.DELETE, produces = "application/json") 
 	public void removePredmetFromSemester(@PathVariable String semesterId, @PathVariable String predmetId) {
 		Semester temp = semesterService.getSemester(semesterId);
 		temp.removePredmet(new Predavanje(predmetId, "", false));
@@ -130,7 +130,7 @@ public class SemesterController {
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT, SEASON_SORT, LETO_SORT
-	@RequestMapping(value="/semsesters/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	@RequestMapping(value="/semsesters/sort/descending/{sortParameter}", method=RequestMethod.GET, produces = "application/json") //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedSemestersDescending(@PathVariable List<String> sortParameter) {
 		List<Semester> semesters = semesterService.getAllSemesters();
 		
@@ -146,7 +146,7 @@ public class SemesterController {
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/semsesters/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	@RequestMapping(value="/semsesters/sort/ascending/{sortParameter}", method=RequestMethod.GET, produces = "application/json") //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedSemestersAscending(@PathVariable List<String> sortParameter) {
 		List<Semester> semesters = semesterService.getAllSemesters();
 		
