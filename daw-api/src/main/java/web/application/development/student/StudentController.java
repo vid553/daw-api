@@ -112,14 +112,25 @@ public class StudentController {
 	
 	//works
 	@RequestMapping(value="/students/{id}/{classId}", method=RequestMethod.POST) 
-	public void enrollStudentToClass(@PathVariable String id, @PathVariable String classId) {
-		Student student = studentService.getStudent(id);
-		student.enrollIntoClass(new Predavanje(classId, "", false));
-		studentService.enrollStudentIntoClass(id, student);
-		
+	public ResponseEntity<?> enrollStudentToClass(@PathVariable String id, @PathVariable String classId) {
 		Predavanje predmet = predmetService.getPredavanje(classId);
-		predmet.enrollIntoClass(new Student(id, "","",""));
-		predmetService.enrollStudentIntoClass(classId, predmet);
+		if (predmet.getEnrolment()) {
+			predmet.enrollIntoClass(new Student(id, "","",""));
+			predmetService.enrollStudentIntoClass(classId, predmet);
+			Student student = studentService.getStudent(id);
+			student.enrollIntoClass(new Predavanje(classId, "", false));
+			studentService.enrollStudentIntoClass(id, student);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		else {
+			// TO DO: authentication needed, if not return error
+			Error error = new Error("http://localhost:8080/error/permision", "Can't join the class.", "This class does not have auto enrollment enabled. Only teachers can add students.");
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.add("Content-Type", "application/problem+json");
+	        headers.add("Content-Language", "en");
+	        return new ResponseEntity<Error>(error, headers, HttpStatus.FORBIDDEN);
+		}
+		
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT, NUMBER_SORT, EMAIL_SORT
