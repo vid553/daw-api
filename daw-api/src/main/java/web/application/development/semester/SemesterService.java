@@ -43,4 +43,7 @@ public class SemesterService {
 		semesterRepository.save(semester);
 	}
 	
+	public Semester getSemesterByName(String name) {
+		return semesterRepository.findByName(name);
+	}
 }

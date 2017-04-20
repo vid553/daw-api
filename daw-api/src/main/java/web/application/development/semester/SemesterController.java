@@ -26,6 +26,7 @@ import com.sebastian_daschner.siren4javaee.Siren;
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
+import web.application.develeopment.headers.Headers;
 import web.application.development.exception.Error;
 
 @RestController
@@ -37,6 +38,8 @@ public class SemesterController {
 	private PredavanjeService predavanjeService;
 	@Autowired
 	private Formatter formatter;
+	
+	private HttpHeaders problemHeader = Headers.ProblemHeader();
 	
 	//works, if non-existing class -> returns 404
 	@RequestMapping(value="/semesters", method=RequestMethod.GET) //maps URL /semesters to method getAllSemesters
@@ -56,10 +59,7 @@ public class SemesterController {
 				String errorMessage = ex + "";
 				String[] errorsInfo = errorMessage.split(": ");
 		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
-		        HttpHeaders headers = new HttpHeaders();
-		        headers.add("Content-Type", "application/problem+json");
-		        headers.add("Content-Language", "en");
-		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 	}
@@ -79,10 +79,7 @@ public class SemesterController {
 				String errorMessage = ex + "";
 				String[] errorsInfo = errorMessage.split(": ");
 		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
-		        HttpHeaders headers = new HttpHeaders();
-		        headers.add("Content-Type", "application/problem+json");
-		        headers.add("Content-Language", "en");
-		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		else {

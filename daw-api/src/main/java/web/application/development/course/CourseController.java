@@ -23,6 +23,9 @@ import com.sebastian_daschner.siren4javaee.Entity;
 import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import web.application.development.exception.Error;
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
@@ -37,6 +40,14 @@ public class CourseController {
 	private PredavanjeService predavanjeService;
 	@Autowired
 	private Formatter formatter;
+	
+	
+	@ApiResponses({
+	    @ApiResponse(code =  404, message ="Non-existing class", response = errorCodesDoc.class),
+	    @ApiResponse(code =  403, message ="Forbidden", response = errorCodesDoc.class),
+	    @ApiResponse(code =  401, message ="Unauthorized", response = errorCodesDoc.class),
+	    @ApiResponse(code =  400, message ="Invalid input", response = errorCodesDoc.class)
+	})
 	
 	//works, if non-existing class -> returns 404
 	@RequestMapping(value="/courses", method=RequestMethod.GET) //maps URL /courses to method getAllCourses
@@ -71,6 +82,13 @@ public class CourseController {
 		}
 	}
 	
+	@ApiResponses({
+	    @ApiResponse(code =  404, message ="Non-existing class", response = errorCodesDoc.class),
+	    @ApiResponse(code =  403, message ="Forbidden", response = errorCodesDoc.class),
+	    @ApiResponse(code =  401, message ="Unauthorized", response = errorCodesDoc.class),
+	    @ApiResponse(code =  400, message ="Invalid input", response = errorCodesDoc.class)
+	})
+	
 	//works if course exists, if non-existing class -> returns 404
 	@RequestMapping(value="/courses/{id}", method=RequestMethod.GET)
 	public HttpEntity<?> getCourse(@PathVariable String id) {
@@ -104,12 +122,26 @@ public class CourseController {
 		}
 	}
 	
+	@ApiResponses({
+	    @ApiResponse(code =  404, message ="Non-existing class", response = errorCodesDoc.class),
+	    @ApiResponse(code =  403, message ="Forbidden", response = errorCodesDoc.class),
+	    @ApiResponse(code =  401, message ="Unauthorized", response = errorCodesDoc.class),
+	    @ApiResponse(code =  400, message ="Invalid input", response = errorCodesDoc.class)
+	})
+	
 	//works
 	@RequestMapping(value="/courses", method=RequestMethod.POST)
 	public void addCourse(@RequestBody Course course) { //@RequestBody tells spring that the request pay load is going to contain a user
 		courseService.addCourse(course);
 	}
 
+	
+	@ApiResponses({
+	    @ApiResponse(code =  404, message ="Non-existing class", response = errorCodesDoc.class),
+	    @ApiResponse(code =  403, message ="Forbidden", response = errorCodesDoc.class),
+	    @ApiResponse(code =  401, message ="Unauthorized", response = errorCodesDoc.class),
+	    @ApiResponse(code =  400, message ="Invalid input", response = errorCodesDoc.class)
+	})
 	
 	@RequestMapping(value="/courses/{courseId}/{classId}", method=RequestMethod.POST) //adds existing class to a course
 	public void addClassToCourse(@PathVariable String classId, @PathVariable String courseId) {
@@ -122,6 +154,13 @@ public class CourseController {
 		predavanjeService.updatePredavanje(classId, predavanje);
 	}
 	
+	@ApiResponses({
+	    @ApiResponse(code =  404, message ="Non-existing class", response = errorCodesDoc.class),
+	    @ApiResponse(code =  403, message ="Forbidden", response = errorCodesDoc.class),
+	    @ApiResponse(code =  401, message ="Unauthorized", response = errorCodesDoc.class),
+	    @ApiResponse(code =  400, message ="Invalid input", response = errorCodesDoc.class)
+	})
+	
 	@RequestMapping(value="/courses/{courseId}", method=RequestMethod.PUT)
 	public void updateCourse(@RequestBody Course course, @PathVariable String courseId) {
 		Course temp = courseService.getCourse(courseId);
@@ -130,18 +169,39 @@ public class CourseController {
 		courseService.updateCourse(courseId, course);
 	}
 	
+	@ApiResponses({
+	    @ApiResponse(code =  404, message ="Non-existing class", response = errorCodesDoc.class),
+	    @ApiResponse(code =  403, message ="Forbidden", response = errorCodesDoc.class),
+	    @ApiResponse(code =  401, message ="Unauthorized", response = errorCodesDoc.class),
+	    @ApiResponse(code =  400, message ="Invalid input", response = errorCodesDoc.class)
+	})
+	
 	//works
 	@RequestMapping(value="/courses/{id}", method=RequestMethod.DELETE)
 	public void deleteCourse(@PathVariable String id) {
 		courseService.deleteCourse(id);
 	}
 	
+	@ApiResponses({
+	    @ApiResponse(code =  404, message ="Non-existing class", response = errorCodesDoc.class),
+	    @ApiResponse(code =  403, message ="Forbidden", response = errorCodesDoc.class),
+	    @ApiResponse(code =  401, message ="Unauthorized", response = errorCodesDoc.class),
+	    @ApiResponse(code =  400, message ="Invalid input", response = errorCodesDoc.class)
+	})
+	
 	@RequestMapping(value="/courses/{courseId}/{classId}", method=RequestMethod.DELETE) //removes course from teacher, body has to have course ID
-	public void remveStudentFromGroup(@PathVariable String courseId, @PathVariable String classId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	public void remveStudentFromGroup(@PathVariable String courseId, @PathVariable String classId) {
 		Course temp = courseService.getCourse(courseId);
 		temp.removeClass(new Predavanje(classId, "", false));
 		courseService.removeClassFromCourse(courseId, temp);
 	}
+	
+	@ApiResponses({
+	    @ApiResponse(code =  404, message ="Non-existing class", response = errorCodesDoc.class),
+	    @ApiResponse(code =  403, message ="Forbidden", response = errorCodesDoc.class),
+	    @ApiResponse(code =  401, message ="Unauthorized", response = errorCodesDoc.class),
+	    @ApiResponse(code =  400, message ="Invalid input", response = errorCodesDoc.class)
+	})
 	
 	//sort parameters are NAME_SORT, ID_SORT, ACRONIM_SORT
 	@RequestMapping(value="/courses/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
@@ -159,6 +219,13 @@ public class CourseController {
 		Entity entity = entityReader.read(object);
 		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 	}
+	
+	@ApiResponses({
+	    @ApiResponse(code =  404, message ="Non-existing class", response = errorCodesDoc.class),
+	    @ApiResponse(code =  403, message ="Forbidden", response = errorCodesDoc.class),
+	    @ApiResponse(code =  401, message ="Unauthorized", response = errorCodesDoc.class),
+	    @ApiResponse(code =  400, message ="Invalid input", response = errorCodesDoc.class)
+	})
 	
 	@RequestMapping(value="/courses/sort/Ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedCoursesAscending(@PathVariable List<String> sortParameter) {
