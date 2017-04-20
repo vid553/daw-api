@@ -23,6 +23,7 @@ import com.sebastian_daschner.siren4javaee.Entity;
 import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
+import web.application.develeopment.headers.Headers;
 import web.application.development.exception.Error;
 import web.application.development.formatter.Formatter;
 import web.application.development.team.Team;
@@ -38,6 +39,9 @@ public class PredavanjeController {
 	@Autowired
 	private Formatter formatter;
 	
+	private HttpHeaders sirenHeader = Headers.SirenHeader();
+	private HttpHeaders problemHeader = Headers.ProblemHeader();
+	
 	//works, if non-existing class -> returns 404
 	@RequestMapping(value="/classes", method=RequestMethod.GET) //maps URL /predmeti to method getAllPredmeti
 	public ResponseEntity<?> getAllPredmeti() {
@@ -50,7 +54,7 @@ public class PredavanjeController {
 				JsonObject object = formatter.ReturnJSON(predavanja, new Predavanje());
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);
-				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
 				String errorMessage = ex + "";
@@ -63,10 +67,7 @@ public class PredavanjeController {
 					detail = "No aditional information available.";
 				}
 		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
-		        HttpHeaders headers = new HttpHeaders();
-		        headers.add("Content-Type", "application/problem+json");
-		        headers.add("Content-Language", "en");
-		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 	}
@@ -80,7 +81,7 @@ public class PredavanjeController {
 				JsonObject object = formatter.ReturnJSON(predmet);
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);
-				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
 				String errorMessage = ex + "";
@@ -93,10 +94,7 @@ public class PredavanjeController {
 					detail = "No aditional information available.";
 				}
 		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
-		        HttpHeaders headers = new HttpHeaders();
-		        headers.add("Content-Type", "application/problem+json");
-		        headers.add("Content-Language", "en");
-		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		
@@ -105,8 +103,9 @@ public class PredavanjeController {
 	
 	//doesnt work if uri contains special characters
 	@RequestMapping(value="/classes", method=RequestMethod.POST)
-	public void addPredavanje(@RequestBody Predavanje predmet) { //@RequestBody tells spring that the request pay load is going to contain a user
+	public ResponseEntity<?> addPredavanje(@RequestBody Predavanje predmet) { //@RequestBody tells spring that the request pay load is going to contain a user
 		predavanjeService.addPredavanje(predmet);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	/*example of pay load
 	 * {
@@ -118,16 +117,17 @@ public class PredavanjeController {
 	
 	//works
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.PUT)
-	public void updatePredavanje(@RequestBody Predavanje predmet, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
+	public ResponseEntity<?> updatePredavanje(@RequestBody Predavanje predmet, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Predavanje temp = predavanjeService.getPredavanje(id);
 		List<Team> teams = temp.getTeams();
 		predmet.setTeams(teams);
 		predavanjeService.updatePredavanje(id, predmet);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	//works
 	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.POST)
-	public void addTeamToPredavanje(@PathVariable String predavanjeId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
+	public ResponseEntity<?> addTeamToPredavanje(@PathVariable String predavanjeId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Predavanje predmet = predavanjeService.getPredavanje(predavanjeId);
 		predmet.addTeam(new Team(teamId,"",0));
 		predavanjeService.addTeamToPredavanje(predavanjeId, predmet);
@@ -135,20 +135,23 @@ public class PredavanjeController {
 		Team team = teamService.getGroup(teamId);
 		team.setPredavanje(predmet);
 		teamService.updateGroup(teamId, team);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.DELETE)
-	public void deletePredmet(@PathVariable String id) {
+	public ResponseEntity<?> deletePredmet(@PathVariable String id) {
 		predavanjeService.deletePredavanje(id);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
 	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.DELETE)
-	public void removeTeamFromPredmet(@PathVariable String predavanjeId, @PathVariable String teamId) {
+	public ResponseEntity<?> removeTeamFromPredmet(@PathVariable String predavanjeId, @PathVariable String teamId) {
 		Predavanje temp = predavanjeService.getPredavanje(predavanjeId);
 		temp.removeTeam(new Team(teamId, "", 0));
 		predavanjeService.removeTeamfromPredavanje(predavanjeId, temp);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//sort parameters are ID_SORT, IDENTIFIER_SORT
@@ -165,7 +168,7 @@ public class PredavanjeController {
 		JsonObject object = formatter.ReturnJSON(predavanja, new Predavanje());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/classes/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
@@ -181,6 +184,6 @@ public class PredavanjeController {
 		JsonObject object = formatter.ReturnJSON(predavanja, new Predavanje());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 	}
 }

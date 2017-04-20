@@ -40,6 +40,7 @@ public class SemesterController {
 	private Formatter formatter;
 	
 	private HttpHeaders problemHeader = Headers.ProblemHeader();
+	private HttpHeaders sirenHeader = Headers.SirenHeader();
 	
 	//works, if non-existing class -> returns 404
 	@RequestMapping(value="/semesters", method=RequestMethod.GET) //maps URL /semesters to method getAllSemesters
@@ -89,13 +90,14 @@ public class SemesterController {
 	
 	//works
 	@RequestMapping(value="/semesters", method=RequestMethod.POST)
-	public void addSemester(@RequestBody Semester semester) { //@RequestBody tells spring that the request pay load is going to contain a user
+	public ResponseEntity<?> addSemester(@RequestBody Semester semester) { //@RequestBody tells spring that the request pay load is going to contain a user
 		semesterService.addSemester(semester);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
 	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.POST)
-	public void addPredmetToSemester(@PathVariable String semesterId, @PathVariable String predmetId) { 
+	public ResponseEntity<?> addPredmetToSemester(@PathVariable String semesterId, @PathVariable String predmetId) { 
 		Semester semester = semesterService.getSemester(semesterId);
 		semester.addPredmet(new Predavanje(predmetId, "", false));
 		semesterService.addPredmetToSemester(semesterId, semester);
@@ -103,30 +105,34 @@ public class SemesterController {
 		Predavanje predavanje = predavanjeService.getPredavanje(predmetId);
 		predavanje.setSemester(semester);
 		predavanjeService.updatePredavanje(predmetId, predavanje);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
 	@RequestMapping(value="/semesters/{id}", method=RequestMethod.PUT)
-	public void updateSemester(@RequestBody Semester semester, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
+	public ResponseEntity<?> updateSemester(@RequestBody Semester semester, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
 		//System.out.println("TEST");
 		Semester temp = semesterService.getSemester(id);
 		List<Predavanje> predmeti = temp.getPredmeti();
 		semester.setPredmeti(predmeti);
 		semesterService.updateSemester(id, semester);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
 	@RequestMapping(value="/semesters/{id}", method=RequestMethod.DELETE)
-	public void deleteSemester(@PathVariable String id) {
+	public ResponseEntity<?> deleteSemester(@PathVariable String id) {
 		semesterService.deleteSemester(id);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
 	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.DELETE) 
-	public void removePredmetFromSemester(@PathVariable String semesterId, @PathVariable String predmetId) {
+	public ResponseEntity<?> removePredmetFromSemester(@PathVariable String semesterId, @PathVariable String predmetId) {
 		Semester temp = semesterService.getSemester(semesterId);
 		temp.removePredmet(new Predavanje(predmetId, "", false));
 		semesterService.removePredmetFromSemester(semesterId, temp);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT, SEASON_SORT, LETO_SORT
@@ -143,7 +149,7 @@ public class SemesterController {
 		JsonObject object = formatter.ReturnJSON(semesters, new Semester());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/semsesters/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
@@ -159,6 +165,6 @@ public class SemesterController {
 		JsonObject object = formatter.ReturnJSON(semesters, new Semester());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 	}
 }
