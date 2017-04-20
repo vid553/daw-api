@@ -23,6 +23,7 @@ import com.sebastian_daschner.siren4javaee.Entity;
 import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
+import web.application.develeopment.headers.Headers;
 import web.application.development.course.Course;
 import web.application.development.course.CourseService;
 import web.application.development.exception.Error;
@@ -42,6 +43,9 @@ public class TeacherController {
 	@Autowired
 	private Formatter formatter;
 	
+	private HttpHeaders sirenHeader = Headers.SirenHeader();
+	private HttpHeaders problemHeader = Headers.ProblemHeader();
+	
 	//works if teacher exists, if non-existing class -> returns 404
 	@RequestMapping(value="/teachers", method=RequestMethod.GET) //maps URL /teachers to method getAllTeachers
 	public ResponseEntity<?> getAllTeachers() {
@@ -54,8 +58,7 @@ public class TeacherController {
 				JsonObject object = formatter.ReturnJSON(teachers, new Teacher());
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);
-
-				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
 				String errorMessage = ex + "";
@@ -68,10 +71,7 @@ public class TeacherController {
 					detail = "No aditional information available.";
 				}
 		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
-				HttpHeaders headers = new HttpHeaders();
-		        headers.add("Content-Type", "application/problem+json");
-		        headers.add("Content-Language", "en");
-		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 	}
@@ -85,7 +85,7 @@ public class TeacherController {
 				JsonObject object = formatter.ReturnJSON(teacher);
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);
-				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
 				String errorMessage = ex + "";
@@ -98,10 +98,7 @@ public class TeacherController {
 					detail = "No aditional information available.";
 				}
 		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
-		        HttpHeaders headers = new HttpHeaders();
-		        headers.add("Content-Type", "application/problem+json");
-		        headers.add("Content-Language", "en");
-		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		else {
@@ -110,12 +107,13 @@ public class TeacherController {
 	}
 	
 	@RequestMapping(value="/teachers", method=RequestMethod.POST)
-	public void addUser(@RequestBody Teacher teacher) { //@RequestBody tells spring that the request pay load is going to contain a user
+	public ResponseEntity<?> addUser(@RequestBody Teacher teacher) { //@RequestBody tells spring that the request pay load is going to contain a user
 		teacherService.addTeacher(teacher);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/teachers/{teacherId}/{courseId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
-	public void addStudentToGroup(@PathVariable String teacherId, @PathVariable String courseId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	public ResponseEntity<?> addStudentToGroup(@PathVariable String teacherId, @PathVariable String courseId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Teacher teacher = teacherService.getTeacher(teacherId);
 		teacher.addCourse(new Course(courseId, "",""));
 		teacherService.addCourseToTeacher(teacherId, teacher);
@@ -123,10 +121,11 @@ public class TeacherController {
 		Course course = courseService.getCourse(courseId);
 		course.setTeacher(teacher);
 		courseService.updateCourse(courseId, course);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/teachers/{teacherId}/classes/{classId}", method=RequestMethod.POST) //adds existing student to group, NO BODY on POST
-	public void assignTeacherToClass(@PathVariable String teacherId, @PathVariable String classId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	public ResponseEntity<?> assignTeacherToClass(@PathVariable String teacherId, @PathVariable String classId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Teacher teacher = teacherService.getTeacher(teacherId);
 		teacher.assignTeacherToClass(new Predavanje(classId, "",false));
 		teacherService.assignTeacherToClass(teacherId, teacher);
@@ -134,27 +133,31 @@ public class TeacherController {
 		Predavanje predmet = predmetService.getPredavanje(classId);
 		predmet.assignTeacherToClass(new Teacher(teacherId, "", "", "", false));
 		predmetService.assignTeacherToClass(classId, predmet);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@RequestMapping(value="/teachers/{teacherId}", method=RequestMethod.PUT)
-	public void updateUser(@RequestBody Teacher teacher, @PathVariable String teacherId) { //@RequestBody tells spring that the request pay load is going to contain a user
+	public ResponseEntity<?> updateUser(@RequestBody Teacher teacher, @PathVariable String teacherId) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Teacher temp = teacherService.getTeacher(teacherId);
 		List<Course> courses = temp.getCourses();
 		teacher.setCourses(courses);
 		teacherService.updateTeacher(teacherId, teacher);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/teachers/{teacherId}", method=RequestMethod.DELETE)
-	public void deleteUser(@PathVariable String teacherId) {
+	public ResponseEntity<?> deleteUser(@PathVariable String teacherId) {
 		teacherService.deleteTeacher(teacherId);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/teachers/{teacherId}/{courseId}", method=RequestMethod.DELETE) //removes course from teacher, body has to have course ID
-	public void remveStudentFromGroup(@PathVariable String courseId, @PathVariable String teacherId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	public ResponseEntity<?> remveStudentFromGroup(@PathVariable String courseId, @PathVariable String teacherId) { //@RequestBody tells spring that the request pay load is going to contain a topics
 		Teacher temp = teacherService.getTeacher(teacherId);
 		//Course course = new Course(courseId, "","");
 		temp.removeCourse(new Course(courseId, "",""));
 		teacherService.removeCourseFromTeacher(teacherId, temp);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT, NUMBER_SORT, EMAIL_SORT
@@ -171,7 +174,7 @@ public class TeacherController {
 		JsonObject object = formatter.ReturnJSON(teachers, new Teacher());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT, NUMBER_SORT, EMAIL_SORT
@@ -188,6 +191,6 @@ public class TeacherController {
 		JsonObject object = formatter.ReturnJSON(teachers, new Teacher());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 	}
 }
