@@ -13,6 +13,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +47,7 @@ public class StudentController {
 	
 	//works empty or with added entities, if non-existing class -> returns 404
 	@RequestMapping(value="/students", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllStudents() {
 		List<Student> students = studentService.getAllStudents();
 		if (students.isEmpty()) {

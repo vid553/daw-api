@@ -19,15 +19,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	public void configureGlobalSecutiry(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication().withUser("teacher").password("teacher").roles("TEACHER");
-		auth.inMemoryAuthentication().withUser("student").password("student").roles("USER");
+		auth.inMemoryAuthentication()
+		.withUser("teacher").password("teacher").roles("TEACHER")
+		.and()
+		.withUser("student").password("student").roles("STUDENT")
+		.and()
+		.withUser("admin").password("admin").roles("ADMIN");
 	}
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		 http.csrf().disable()
 		.authorizeRequests()
-		.antMatchers("/**").hasRole("TEACHER")
+		.antMatchers("/**").hasAnyRole("TEACHER", "STUDENT", "ADMIN")
 		.and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
         .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
