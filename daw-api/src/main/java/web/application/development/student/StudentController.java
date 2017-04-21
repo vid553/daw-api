@@ -7,6 +7,8 @@ import java.util.List;
 import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -45,6 +47,28 @@ public class StudentController {
 	@RequestMapping(value="/students", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<?> getAllStudents() {
 		List<Student> students = studentService.getAllStudents();
+		if (students.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		else {
+			try {
+				JsonObject object = formatter.ReturnJSON(students, new Student());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+	}
+	
+	@RequestMapping(value="/students/listed/{listingNum}", method=RequestMethod.GET) 
+	public ResponseEntity<?> getAllStudentsPages(@PathVariable int listingNum) {				
+		List<Student> students = studentService.findAll(new PageRequest(1, listingNum));
 		if (students.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}

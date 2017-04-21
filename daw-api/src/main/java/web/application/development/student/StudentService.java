@@ -1,9 +1,11 @@
 package web.application.development.student;
 
+import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -43,4 +45,7 @@ public class StudentService {
 		studentRepository.save(student);
 	}
 	
+	public List<Student> findAll(Pageable pageable) {
+		return studentRepository.findAll(pageable).getContent();
+	}
 }
