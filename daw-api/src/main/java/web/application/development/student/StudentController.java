@@ -66,14 +66,15 @@ public class StudentController {
 		}
 	}
 	
-	@RequestMapping(value="/students/listed/{listingNum}", method=RequestMethod.GET) 
-	public ResponseEntity<?> getAllStudentsPages(@PathVariable int listingNum) {				
-		List<Student> students = studentService.findAll(new PageRequest(1, listingNum));
-		if (students.isEmpty()) {
+	@RequestMapping(value="/students/listed/{pageNum}/{sizeNum}", method=RequestMethod.GET) 
+	public ResponseEntity<?> getAllStudentsPages(@PathVariable int pageNum, @PathVariable int sizeNum) {				
+		Page<Student> pageStudents = studentService.findAll(new PageRequest(pageNum, sizeNum));
+		if (pageStudents.getTotalPages() == 0) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		else {
 			try {
+				List<Student> students = pageStudents.getContent();
 				JsonObject object = formatter.ReturnJSON(students, new Student());
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);

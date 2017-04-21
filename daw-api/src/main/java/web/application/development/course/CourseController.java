@@ -9,6 +9,8 @@ import java.util.List;
 import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -102,6 +104,36 @@ public class CourseController {
 		}
 	}
 	
+	@RequestMapping(value="/courses/listed/{pageNum}/{sizeNum}", method=RequestMethod.GET)
+	public HttpEntity<?> getCourse(@PathVariable int pageNum, @PathVariable int sizeNum) {
+		Page<Course> pageCourses = courseService.findAll(new PageRequest(pageNum, sizeNum));
+		if (pageCourses.getTotalPages() != 0) {
+			try {
+				List<Course> courses = pageCourses.getContent();
+				JsonObject object = formatter.ReturnJSON(courses, new Course());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
 	//works
 	@RequestMapping(value="/courses", method=RequestMethod.POST)
 	public ResponseEntity<?> addCourse(@RequestBody Course course) { //@RequestBody tells spring that the request pay load is going to contain a user
@@ -150,7 +182,7 @@ public class CourseController {
 	//sort parameters are NAME_SORT, ID_SORT, ACRONIM_SORT
 	@RequestMapping(value="/courses/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedCoursesDescending(@PathVariable List<String> sortParameter) {
-		List<Course> courses = new ArrayList<>();
+		List<Course> courses = courseService.getAllCourses();
 		
 		List<CourseComparator> comparators = new ArrayList<>();
 		for (String s : sortParameter) {
@@ -167,7 +199,7 @@ public class CourseController {
 	
 	@RequestMapping(value="/courses/sort/Ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedCoursesAscending(@PathVariable List<String> sortParameter) {
-		List<Course> courses = new ArrayList<>();
+		List<Course> courses = courseService.getAllCourses();
 		
 		List<CourseComparator> comparators = new ArrayList<>();
 		for (String s : sortParameter) {

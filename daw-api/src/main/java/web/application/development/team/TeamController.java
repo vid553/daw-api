@@ -9,6 +9,9 @@ import java.util.List;
 import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +31,7 @@ import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.student.Student;
 import web.application.development.student.StudentService;
+import web.application.development.teacher.Teacher;
 
 
 @RestController
@@ -166,7 +170,7 @@ public class TeamController {
 	//sort parameters are NAME_SORT, ID_SORT
 	@RequestMapping(value="/groups/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedGroupsDescending(@PathVariable List<String> sortParameter) {
-		List<Team> groups = new ArrayList<>();
+		List<Team> groups = groupService.getAllGroups();
 		
 		List<TeamComparator> comparators = new ArrayList<>();
 		for (String s : sortParameter) {
@@ -182,7 +186,7 @@ public class TeamController {
 	
 	@RequestMapping(value="/groups/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedGroupsAscending(@PathVariable List<String> sortParameter) {
-		List<Team> groups = new ArrayList<>();
+		List<Team> groups = groupService.getAllGroups();
 		
 		List<TeamComparator> comparators = new ArrayList<>();
 		for (String s : sortParameter) {
@@ -194,6 +198,36 @@ public class TeamController {
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
 		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/groups/listed/{pageNum}/{sizeNum}", method=RequestMethod.GET)
+	public HttpEntity<?> getGroups(@PathVariable int pageNum, @PathVariable int sizeNum) {
+		Page<Team> pageGroups = groupService.findAll(new PageRequest(pageNum, sizeNum));
+		if (pageGroups.getTotalPages() != 0) {
+			try {
+				List<Team> groups = pageGroups.getContent();
+				JsonObject object = formatter.ReturnJSON(groups, new Team());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 }

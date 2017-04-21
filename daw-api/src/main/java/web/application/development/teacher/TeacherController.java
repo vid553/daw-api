@@ -9,6 +9,8 @@ import java.util.List;
 import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,7 @@ import web.application.development.exception.Error;
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
+import web.application.development.semester.Semester;
 
 @RestController
 public class TeacherController {
@@ -163,7 +166,7 @@ public class TeacherController {
 	//sort parameters are NAME_SORT, ID_SORT, NUMBER_SORT, EMAIL_SORT
 	@RequestMapping(value="/teachers/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedTeachersDescending(@PathVariable List<String> sortParameter) {
-		List<Teacher> teachers = new ArrayList<>();
+		List<Teacher> teachers = teacherService.getAllTeachers();
 		
 		List<TeacherComparator> comparators = new ArrayList<>();
 		for (String s : sortParameter) {
@@ -180,7 +183,7 @@ public class TeacherController {
 	//sort parameters are NAME_SORT, ID_SORT, NUMBER_SORT, EMAIL_SORT
 	@RequestMapping(value="/teachers/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedTeachersAscending(@PathVariable List<String> sortParameter) {
-		List<Teacher> teachers = new ArrayList<>();
+		List<Teacher> teachers = teacherService.getAllTeachers();
 		
 		List<TeacherComparator> comparators = new ArrayList<>();
 		for (String s : sortParameter) {
@@ -192,5 +195,35 @@ public class TeacherController {
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
 		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/teachers/listed/{pageNum}/{sizeNum}", method=RequestMethod.GET)
+	public HttpEntity<?> getTeachers(@PathVariable int pageNum, @PathVariable int sizeNum) {
+		Page<Teacher> pageTeachers = teacherService.findAll(new PageRequest(pageNum, sizeNum));
+		if (pageTeachers.getTotalPages() != 0) {
+			try {
+				List<Teacher> teachers = pageTeachers.getContent();
+				JsonObject object = formatter.ReturnJSON(teachers, new Teacher());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 }

@@ -9,6 +9,8 @@ import java.util.List;
 import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -166,5 +168,35 @@ public class SemesterController {
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
 		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/semesters/listed/{pageNum}/{sizeNum}", method=RequestMethod.GET)
+	public HttpEntity<?> getSemesters(@PathVariable int pageNum, @PathVariable int sizeNum) {
+		Page<Semester> pageSemesters = semesterService.findAll(new PageRequest(pageNum, sizeNum));
+		if (pageSemesters.getTotalPages() != 0) {
+			try {
+				List<Semester> semesters = pageSemesters.getContent();
+				JsonObject object = formatter.ReturnJSON(semesters, new Semester());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+				String detail;
+				if (errorsInfo.length > 1) {
+					detail = errorsInfo[1];
+				}
+				else {
+					detail = "No aditional information available.";
+				}
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 }

@@ -45,7 +45,7 @@ public class StudentService {
 		studentRepository.save(student);
 	}
 	
-	public List<Student> findAll(Pageable pageable) {
-		return studentRepository.findAll(pageable).getContent();
+	public Page<Student> findAll(Pageable pageable) {
+		return studentRepository.findAll(pageable);
 	}
 }
