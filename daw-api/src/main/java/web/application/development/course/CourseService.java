@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import web.application.development.student.Student;
 
 @Service
 public class CourseService {
@@ -45,5 +49,9 @@ public class CourseService {
 	
 	public Course getCourseByName(String name) {
 		return courseRepository.findByName(name);
+	}
+	
+	public Page<Course> findAll(Pageable pageable) {
+		return courseRepository.findAll(pageable);
 	}
 }
