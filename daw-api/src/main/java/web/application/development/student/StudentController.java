@@ -27,6 +27,7 @@ import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.develeopment.headers.Headers;
 import web.application.development.exception.Error;
+import web.application.development.exception.ErrorLog;
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
@@ -61,9 +62,8 @@ public class StudentController {
 				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
-				String errorMessage = ex + "";
-				String[] errorsInfo = errorMessage.split(": ");
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+				String timeStamp = new ErrorLog().WriteErorLog(ex);
+		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
 		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
@@ -104,9 +104,8 @@ public class StudentController {
 				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
-				String errorMessage = ex + "";
-				String[] errorsInfo = errorMessage.split(": ");
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+				String timeStamp = new ErrorLog().WriteErorLog(ex);
+		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
 		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
@@ -117,6 +116,7 @@ public class StudentController {
 
 	//works
 	@RequestMapping(value="/students", method=RequestMethod.POST)
+	@PreAuthorize("hasRole('TEACHER')")
 	public ResponseEntity<?> addStudent(@RequestBody Student student) { //@RequestBody tells spring that the request pay load is going to contain a user
 		studentService.addStudent(student);
 		return new ResponseEntity<>(HttpStatus.OK);

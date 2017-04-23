@@ -30,6 +30,7 @@ import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
 import web.application.develeopment.headers.Headers;
 import web.application.development.exception.Error;
+import web.application.development.exception.ErrorLog;
 
 @RestController
 public class SemesterController {
@@ -59,9 +60,8 @@ public class SemesterController {
 				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 			}
 			catch (Exception ex) {
-				String errorMessage = ex + "";
-				String[] errorsInfo = errorMessage.split(": ");
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+				String timeStamp = new ErrorLog().WriteErorLog(ex);
+		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
 		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
@@ -79,9 +79,8 @@ public class SemesterController {
 				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
 			}
 			catch (Exception ex) {
-				String errorMessage = ex + "";
-				String[] errorsInfo = errorMessage.split(": ");
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+				String timeStamp = new ErrorLog().WriteErorLog(ex);
+		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
 		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}

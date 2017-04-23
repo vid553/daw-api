@@ -20,7 +20,7 @@ import web.application.development.teacher.Teacher;
 import web.application.development.team.Team;
 
 @Entity
-public class Predavanje {
+public class Predavanje {	// Predavanje is a slovenian word for class ("turma")
 
 	@Id	//primary key
 	private String id;
