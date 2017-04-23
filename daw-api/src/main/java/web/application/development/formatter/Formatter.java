@@ -46,6 +46,8 @@ public class Formatter {
 			    .addProperty("identifier", predavanje.getIdentifier())
 			    .addProperty("enrolment_auto", predavanje.getEnrolment());
 		
+		//find configuration for null orperties and empty arrays in jackson
+		
 		List<Team> groups = predavanje.getTeams();
 		for (Team g : groups) {
 			predavanjeEntity.addEntity(ReturnJSON(g, new Team()));

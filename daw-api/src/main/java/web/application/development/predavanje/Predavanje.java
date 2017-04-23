@@ -7,6 +7,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PreRemove;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +20,7 @@ import web.application.development.teacher.Teacher;
 import web.application.development.team.Team;
 
 @Entity
-public class Predavanje {
+public class Predavanje {	// Predavanje is a slovenian word for class ("turma")
 
 	@Id	//primary key
 	private String id;

@@ -7,10 +7,14 @@ import java.util.List;
 import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +27,7 @@ import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.develeopment.headers.Headers;
 import web.application.development.exception.Error;
+import web.application.development.exception.ErrorLog;
 import web.application.development.formatter.Formatter;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
@@ -43,6 +48,7 @@ public class StudentController {
 	
 	//works empty or with added entities, if non-existing class -> returns 404
 	@RequestMapping(value="/students", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllStudents() {
 		List<Student> students = studentService.getAllStudents();
 		if (students.isEmpty()) {
@@ -50,6 +56,28 @@ public class StudentController {
 		}
 		else {
 			try {
+				JsonObject object = formatter.ReturnJSON(students, new Student());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String timeStamp = new ErrorLog().WriteErorLog(ex);
+		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+	}
+	
+	@RequestMapping(value="/students/listed/{pageNum}/{sizeNum}", method=RequestMethod.GET) 
+	public ResponseEntity<?> getAllStudentsPages(@PathVariable int pageNum, @PathVariable int sizeNum) {				
+		Page<Student> pageStudents = studentService.findAll(new PageRequest(pageNum, sizeNum));
+		if (pageStudents.getTotalPages() == 0) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		else {
+			try {
+				List<Student> students = pageStudents.getContent();
 				JsonObject object = formatter.ReturnJSON(students, new Student());
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);
@@ -76,9 +104,8 @@ public class StudentController {
 				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
-				String errorMessage = ex + "";
-				String[] errorsInfo = errorMessage.split(": ");
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
+				String timeStamp = new ErrorLog().WriteErorLog(ex);
+		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
 		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
@@ -89,6 +116,7 @@ public class StudentController {
 
 	//works
 	@RequestMapping(value="/students", method=RequestMethod.POST)
+	@PreAuthorize("hasRole('TEACHER')")
 	public ResponseEntity<?> addStudent(@RequestBody Student student) { //@RequestBody tells spring that the request pay load is going to contain a user
 		studentService.addStudent(student);
 		return new ResponseEntity<>(HttpStatus.OK);
