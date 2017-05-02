@@ -1,4 +1,4 @@
-package web.application.development.secutiry;
+package web.application.development.security;
 
 import java.io.IOException;
 import java.io.PrintWriter;
