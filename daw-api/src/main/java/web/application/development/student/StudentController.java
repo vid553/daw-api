@@ -13,6 +13,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,10 +25,10 @@ import com.sebastian_daschner.siren4javaee.Entity;
 import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
+import web.application.develeopment.headers.Headers;
 import web.application.development.exception.Error;
 import web.application.development.exception.ErrorLog;
 import web.application.development.formatter.Formatter;
-import web.application.development.headers.Headers;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
 import static web.application.development.student.StudentComparator.*;
@@ -47,6 +48,7 @@ public class StudentController {
 	
 	//works empty or with added entities, if non-existing class -> returns 404
 	@RequestMapping(value="/students", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllStudents() {
 		List<Student> students = studentService.getAllStudents();
 		if (students.isEmpty()) {
@@ -82,8 +84,9 @@ public class StudentController {
 				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
-				String timeStamp = new ErrorLog().WriteErorLog(ex);
-		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
+				String errorMessage = ex + "";
+				String[] errorsInfo = errorMessage.split(": ");
+		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), errorsInfo[1]);
 		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
@@ -113,7 +116,7 @@ public class StudentController {
 
 	//works
 	@RequestMapping(value="/students", method=RequestMethod.POST)
-	@PreAuthorize("hasRole('ADMIN')")	// only administrators can create users  
+	@PreAuthorize("hasRole('TEACHER')")
 	public ResponseEntity<?> addStudent(@RequestBody Student student) { //@RequestBody tells spring that the request pay load is going to contain a user
 		studentService.addStudent(student);
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -121,7 +124,6 @@ public class StudentController {
 	
 	//works
 	@RequestMapping(value="/students/{id}", method=RequestMethod.PUT)
-	@PreAuthorize("hasRole('ADMIN')")	// only admins can edit users 
 	public ResponseEntity<?> updateStudent(@RequestBody Student student, @PathVariable String id) { 
 		studentService.updateStudent(id, student);
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -129,14 +131,13 @@ public class StudentController {
 	
 	//works
 	@RequestMapping(value="/students/{id}", method=RequestMethod.DELETE)
-	@PreAuthorize("hasRole('ADMIN')")	// only admins can delete users
 	public ResponseEntity<?> deleteStudent(@PathVariable String id) {
 		studentService.deleteStudent(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
-	@RequestMapping(value="/students/{id}/{classId}", method=RequestMethod.POST)
+	@RequestMapping(value="/students/{id}/{classId}", method=RequestMethod.POST) 
 	public ResponseEntity<?> enrollStudentToClass(@PathVariable String id, @PathVariable String classId) {
 		Predavanje predmet = predmetService.getPredavanje(classId);
 		if (predmet.getEnrolment()) {
@@ -147,30 +148,15 @@ public class StudentController {
 			studentService.enrollStudentIntoClass(id, student);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
-		
 		else {
-			if (enrollAuthenticated()) {
-				predmet.enrollIntoClass(new Student(id, "","",""));
-				predmetService.enrollStudentIntoClass(classId, predmet);
-				Student student = studentService.getStudent(id);
-				student.enrollIntoClass(new Predavanje(classId, "", false));
-				studentService.enrollStudentIntoClass(id, student);
-				return new ResponseEntity<>(HttpStatus.OK);
-			}
-			else {
-				Error error = new Error("http://localhost:8080/error/permision", "Can't join the class.", "This class does not have auto enrollment enabled. Only teachers can add students.");
-		        HttpHeaders headers = new HttpHeaders();
-		        headers.add("Content-Type", "application/problem+json");
-		        headers.add("Content-Language", "en");
-		        return new ResponseEntity<Error>(error, headers, HttpStatus.FORBIDDEN);
-			}
+			// TO DO: authentication needed, if not return error
+			Error error = new Error("http://localhost:8080/error/permision", "Can't join the class.", "This class does not have auto enrollment enabled. Only teachers can add students.");
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.add("Content-Type", "application/problem+json");
+	        headers.add("Content-Language", "en");
+	        return new ResponseEntity<Error>(error, headers, HttpStatus.FORBIDDEN);
 		}
 		
-	}
-	
-	@PreAuthorize("hasRole('ADMIN')")
-	public Boolean enrollAuthenticated() {
-		return true;
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT, NUMBER_SORT, EMAIL_SORT

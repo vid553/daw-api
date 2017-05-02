@@ -1,4 +1,4 @@
-package web.application.development.security;
+package web.application.development.secutiry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -52,4 +52,3 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	  * error instance ID in response, no need for description, just an ID that allows someone with access to the logs to find out what happened
 	  */
 }
-
