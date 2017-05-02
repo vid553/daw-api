@@ -1,4 +1,4 @@
-package web.application.development.headers;
+package web.application.develeopment.headers;
 
 import org.springframework.http.HttpHeaders;
 
