@@ -52,4 +52,3 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	  * error instance ID in response, no need for description, just an ID that allows someone with access to the logs to find out what happened
 	  */
 }
-
