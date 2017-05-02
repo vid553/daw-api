@@ -15,6 +15,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,11 +26,10 @@ import com.sebastian_daschner.siren4javaee.Entity;
 import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
-import web.application.develeopment.headers.Headers;
-import web.application.development.course.Course;
 import web.application.development.exception.Error;
 import web.application.development.exception.ErrorLog;
 import web.application.development.formatter.Formatter;
+import web.application.development.headers.Headers;
 import web.application.development.team.Team;
 import web.application.development.team.TeamService;
 
@@ -91,6 +91,7 @@ public class PredavanjeController {
 	
 	//doesnt work if uri contains special characters
 	@RequestMapping(value="/classes", method=RequestMethod.POST)
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> addPredavanje(@RequestBody Predavanje predmet) { //@RequestBody tells spring that the request pay load is going to contain a user
 		predavanjeService.addPredavanje(predmet);
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -105,6 +106,7 @@ public class PredavanjeController {
 	
 	//works
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.PUT)
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> updatePredavanje(@RequestBody Predavanje predmet, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Predavanje temp = predavanjeService.getPredavanje(id);
 		List<Team> teams = temp.getTeams();
@@ -115,6 +117,7 @@ public class PredavanjeController {
 
 	//works
 	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
 	public ResponseEntity<?> addTeamToPredavanje(@PathVariable String predavanjeId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Predavanje predmet = predavanjeService.getPredavanje(predavanjeId);
 		predmet.addTeam(new Team(teamId,"",0));
@@ -128,6 +131,7 @@ public class PredavanjeController {
 	
 	//works
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.DELETE)
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> deletePredmet(@PathVariable String id) {
 		predavanjeService.deletePredavanje(id);
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -135,6 +139,7 @@ public class PredavanjeController {
 	
 	//works
 	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.DELETE)
+	@PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
 	public ResponseEntity<?> removeTeamFromPredmet(@PathVariable String predavanjeId, @PathVariable String teamId) {
 		Predavanje temp = predavanjeService.getPredavanje(predavanjeId);
 		temp.removeTeam(new Team(teamId, "", 0));
@@ -187,16 +192,8 @@ public class PredavanjeController {
 				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
-				String errorMessage = ex + "";
-				String[] errorsInfo = errorMessage.split(": ");
-				String detail;
-				if (errorsInfo.length > 1) {
-					detail = errorsInfo[1];
-				}
-				else {
-					detail = "No aditional information available.";
-				}
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
+				String timeStamp = new ErrorLog().WriteErorLog(ex);
+		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
 		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
