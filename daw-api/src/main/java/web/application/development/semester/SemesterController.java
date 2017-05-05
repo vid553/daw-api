@@ -9,10 +9,13 @@ import java.util.List;
 import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,9 +27,9 @@ import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.formatter.Formatter;
+import web.application.development.headers.Headers;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
-import web.application.develeopment.headers.Headers;
 import web.application.development.exception.Error;
 import web.application.development.exception.ErrorLog;
 
@@ -89,6 +92,7 @@ public class SemesterController {
 	
 	//works
 	@RequestMapping(value="/semesters", method=RequestMethod.POST)
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> addSemester(@RequestBody Semester semester) { //@RequestBody tells spring that the request pay load is going to contain a user
 		semesterService.addSemester(semester);
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -96,6 +100,7 @@ public class SemesterController {
 	
 	//works
 	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.POST)
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> addPredmetToSemester(@PathVariable String semesterId, @PathVariable String predmetId) { 
 		Semester semester = semesterService.getSemester(semesterId);
 		semester.addPredmet(new Predavanje(predmetId, "", false));
@@ -109,6 +114,7 @@ public class SemesterController {
 	
 	//works
 	@RequestMapping(value="/semesters/{id}", method=RequestMethod.PUT)
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> updateSemester(@RequestBody Semester semester, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
 		//System.out.println("TEST");
 		Semester temp = semesterService.getSemester(id);
@@ -120,13 +126,15 @@ public class SemesterController {
 	
 	//works
 	@RequestMapping(value="/semesters/{id}", method=RequestMethod.DELETE)
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> deleteSemester(@PathVariable String id) {
 		semesterService.deleteSemester(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
-	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.DELETE) 
+	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.DELETE)
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> removePredmetFromSemester(@PathVariable String semesterId, @PathVariable String predmetId) {
 		Semester temp = semesterService.getSemester(semesterId);
 		temp.removePredmet(new Predavanje(predmetId, "", false));
@@ -165,5 +173,27 @@ public class SemesterController {
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
 		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/semesters/listed/{pageNum}/{sizeNum}", method=RequestMethod.GET)
+	public HttpEntity<?> getSemesters(@PathVariable int pageNum, @PathVariable int sizeNum) {
+		Page<Semester> pageSemesters = semesterService.findAll(new PageRequest(pageNum, sizeNum));
+		if (pageSemesters.getTotalPages() != 0) {
+			try {
+				List<Semester> semesters = pageSemesters.getContent();
+				JsonObject object = formatter.ReturnJSON(semesters, new Semester());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String timeStamp = new ErrorLog().WriteErorLog(ex);
+		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 }

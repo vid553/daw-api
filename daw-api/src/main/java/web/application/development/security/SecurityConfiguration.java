@@ -1,4 +1,4 @@
-package web.application.development.secutiry;
+package web.application.development.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -44,4 +44,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
     }
+	 
+	 //how to check authorization?
+	 /* 1. authentication - we get user
+	  * 2. create a context that contains the user, and the roles for the user, one way is by having a bean, acts as a container for the information, every component that needs to check access level depends on the bean
+	  * 
+	  * error instance ID in response, no need for description, just an ID that allows someone with access to the logs to find out what happened
+	  */
 }
