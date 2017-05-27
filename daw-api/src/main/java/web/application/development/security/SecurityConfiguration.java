@@ -30,7 +30,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable()
 		.authorizeRequests()
-		.antMatchers("/**").hasAnyRole("TEACHER", "STUDENT", "ADMIN")
+		//.antMatchers("/**").hasAnyRole("TEACHER", "STUDENT", "ADMIN")
+		.antMatchers("/**").permitAll()
 		.and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
         .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}

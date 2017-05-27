@@ -7,6 +7,8 @@ import javax.json.JsonObject;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sebastian_daschner.siren4javaee.EntityBuilder;
 import com.sebastian_daschner.siren4javaee.Siren;
 
@@ -36,7 +38,7 @@ public class Formatter {
 		Classes.addLink(URI.create(Uri), "self");
 		return Classes.build();
 	}	
-	
+
 	public JsonObject ReturnJSON(Predavanje predavanje) {
 
 		String Uri = "http://localhost:8080/classes/" + predavanje.getId();
@@ -75,20 +77,20 @@ public class Formatter {
 		
 		return predavanjeEntity.build();
 	}
-	
+
 	public JsonObject ReturnJSON(List<Student> students, Student student) {
 		String Uri = "http://localhost:8080/students";
 		EntityBuilder Students = Siren.createEntityBuilder();
 		Students.addClass("students");
 		
 		for (Student s : students) {
-			Students.addEntity(ReturnJSON(s));
+			Students.addEntity(ReturnJSON(s, new Student()));
 		}
 		
 		Students.addLink(URI.create(Uri), "self");
 		return Students.build();
 	}
-	
+
 	public JsonObject ReturnJSON(Student student) {
 		String Uri = "http://localhost:8080/students/" + student.getId();
 		EntityBuilder studentEntity = Siren.createEntityBuilder()
@@ -97,14 +99,14 @@ public class Formatter {
 			    .addProperty("name", student.getName())
 			    .addProperty("email", student.getEmail())
 			    .addProperty("number", student.getNumber());
-		
+
 		List<Predavanje> predavanja = student.getClasses();
 		
 		for (Predavanje p : predavanja) {
 			studentEntity.addEntity(ReturnJSON(p, new Student()));
 		}
 		
-	  studentEntity.addLink(URI.create(Uri), "self");
+		studentEntity.addLink(URI.create(Uri), "self");
 		return studentEntity.build();
 	}
 	
@@ -114,7 +116,7 @@ public class Formatter {
 		Groups.addClass("groups");
 		
 		for (Team g : groups) {
-			Groups.addEntity(ReturnJSON(g));
+			Groups.addEntity(ReturnJSON(g, new Team()));
 		}
 		
 		Groups.addLink(URI.create(Uri), "self");
@@ -150,7 +152,7 @@ public class Formatter {
 		Semesters.addClass("semesters");
 		
 		for (Semester s : semesters) {
-			Semesters.addEntity(ReturnJSON(s));
+			Semesters.addEntity(ReturnJSON(s, new Semester()));
 		}
 		
 		Semesters.addLink(URI.create(Uri), "self");
@@ -184,7 +186,7 @@ public class Formatter {
 		Courses.addClass("courses");
 		
 		for (Course c : courses) {
-			Courses.addEntity(ReturnJSON(c));
+			Courses.addEntity(ReturnJSON(c, new Course()));
 		}
 		
 		Courses.addLink(URI.create(Uri), "self");
@@ -217,7 +219,7 @@ public class Formatter {
 		Teachers.addClass("teachers");
 		
 		for (Teacher t : teachers) {
-			Teachers.addEntity(ReturnJSON(t));
+			Teachers.addEntity(ReturnJSON(t, new Teacher()));
 		}
 		
 		Teachers.addLink(URI.create(Uri), "self");
