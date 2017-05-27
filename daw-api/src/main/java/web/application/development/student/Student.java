@@ -8,6 +8,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.PreRemove;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import web.application.development.predavanje.Predavanje;
 
 @Entity 
