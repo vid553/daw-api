@@ -97,6 +97,6 @@ public class Team{
 	@PreRemove
 	private void removeTeam() {
 	    
-	    this.predavanje.getTeams().remove(this);
+	    if (this.predavanje != null) {this.predavanje.getTeams().remove(this);}
 	}
 }
