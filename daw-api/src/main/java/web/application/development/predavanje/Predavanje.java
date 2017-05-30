@@ -7,6 +7,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PreRemove;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -140,9 +143,9 @@ public class Predavanje {	// Predavanje is a slovenian word for class ("turma")
 	        t.getPredavanja().remove(this);
 	    }
 	    
-	    semester.getPredmeti().remove(this);
+	    if (this.semester != null) {semester.getPredmeti().remove(this);}
 	    
-	    course.getClasses().remove(this);
+	    if (this.course != null) {course.getClasses().remove(this);}
 	}
 	
 	public Course getCourse() {
