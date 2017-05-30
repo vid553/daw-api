@@ -3,11 +3,14 @@ package web.application.development.teacher;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.PreRemove;
+
+import org.apache.commons.logging.Log;
 
 import web.application.development.course.Course;
 import web.application.development.predavanje.Predavanje;
@@ -123,8 +126,18 @@ public class Teacher{
 	
 	@PreRemove
 	private void removePredavanjeFromTeacher() {
-	    for (Predavanje p : this.predavanja) {
+	    if (!this.predavanja.isEmpty()) {
+		for (Predavanje p : this.predavanja) {
 	        p.getTeachers().remove(this);
 	    }
+	    }
+	    
+	    if (!this.courses.isEmpty()) {
+	    	for (Course c : this.courses) {
+	    		if(c.getTeacher() == this) {
+	    			c.setTeacher(null);
+	    	}
+	    }
 	}
+}
 }

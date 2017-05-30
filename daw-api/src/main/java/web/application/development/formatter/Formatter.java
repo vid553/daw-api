@@ -129,7 +129,7 @@ public class Formatter {
 				.addClass("group")
 				.addProperty("id", group.getId())
 				.addProperty("name", group.getName())
-				.addProperty("students limit", group.getStudents_limit());
+				.addProperty("students_limit", group.getStudents_limit());
 		
 		List<Student> students = group.getStudents();
 		
@@ -257,6 +257,7 @@ public class Formatter {
 	public JsonObject ReturnJSON(Predavanje predavanje, Object placeholder) {
 		String Uri = "http://localhost:8080/classes/" + predavanje.getId();
 		EntityBuilder predavanjeEntity = Siren.createEntityBuilder()
+				.setTitle("class")
 				.addClass("class")
 				.addProperty("id", predavanje.getId())
 				.addProperty("identifier", predavanje.getIdentifier())
@@ -271,6 +272,7 @@ public class Formatter {
 
 		String Uri = "http://localhost:8080/teachers/" + teacher.getId();
 		EntityBuilder teacherEntity = Siren.createEntityBuilder()
+				.setTitle("teacher")
 			    .addClass("teacher")
 			    .addProperty("id", teacher.getId())
 			    .addProperty("name", teacher.getName())
@@ -286,6 +288,7 @@ public class Formatter {
 	public JsonObject ReturnJSON(Course course, Object placeholder) {
 		String Uri = "http://localhost:8080/courses/" + course.getId();
 		EntityBuilder courseEntity = Siren.createEntityBuilder()
+				.setTitle("course")
 				.addClass("course")
 				.addProperty("id", course.getId())
 				.addProperty("name", course.getAcronim())
@@ -298,6 +301,7 @@ public class Formatter {
 	public JsonObject ReturnJSON(Student student, Object placeholder) {
 		String Uri = "http://localhost:8080/students/" + student.getId();
 		EntityBuilder studentEntity = Siren.createEntityBuilder()
+				.setTitle("student")
 				.addClass("student")
 				.addProperty("id", student.getId())
 				.addProperty("name", student.getName())
@@ -311,10 +315,11 @@ public class Formatter {
 	public JsonObject ReturnJSON(Team group, Object placeholder) {
 		String Uri = "http://localhost:8080/groups/" + group.getId();
 		EntityBuilder groupEntity = Siren.createEntityBuilder()
+				.setTitle("group")
 				.addClass("group")
 				.addProperty("id", group.getId())
 				.addProperty("name", group.getName())
-				.addProperty("students limit", group.getStudents_limit())
+				.addProperty("students_limit", group.getStudents_limit())
 				.addLink(URI.create(Uri), "self");
 		
 		return groupEntity.build();
@@ -323,6 +328,7 @@ public class Formatter {
 	public JsonObject ReturnJSON(Semester semester, Object placeholder) {
 		String Uri = "http://localhost:8080/semesters/" + semester.getId();
 		EntityBuilder semesterEntity = Siren.createEntityBuilder()
+				.setTitle("semester")
 			    .addClass("semester")
 			    .addProperty("id", semester.getId())
 			    .addProperty("name", semester.getName())
