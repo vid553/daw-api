@@ -55,6 +55,10 @@ public class PredavanjeService {
 		predmetRepository.save(predmet);
 	}
 	
+	public void removeTeacherFromClass(String id, Predavanje predmet) {
+		predmetRepository.save(predmet);
+	}
+	
 	public Predavanje getPredavanjeByIdentifier(String identifier) {
 		return predmetRepository.findByIdentifier(identifier);
 	}

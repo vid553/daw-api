@@ -47,6 +47,10 @@ public class TeacherService {
 		teacherRepository.save(teacher);
 	}
 	
+	public void removeClassFromTeacher(String id, Teacher teacher) {
+		teacherRepository.save(teacher);
+	}
+	
 	public void assignTeacherToClass(String id, Teacher teacher) {
 		teacherRepository.save(teacher);
 	}

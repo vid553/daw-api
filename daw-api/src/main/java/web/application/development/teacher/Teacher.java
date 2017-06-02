@@ -110,6 +110,16 @@ public class Teacher{
 		this.courses.removeAll(courses);
 	}
 	
+	public void removeClass(Predavanje klass) {
+		List<Predavanje> klasses = new ArrayList<Predavanje>();
+		for(Predavanje c : this.predavanja){
+		    if(c.getId().equals(klass.getId())) {
+		    	klasses.add(c);
+		    }
+		}
+		this.predavanja.removeAll(klasses);
+	}
+	
 	public void assignTeacherToClass(Predavanje predmet) {
 		if (!this.predavanja.contains(predmet)) {
 			this.predavanja.add(predmet);
@@ -139,5 +149,5 @@ public class Teacher{
 	    	}
 	    }
 	}
-}
+	}
 }

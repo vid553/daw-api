@@ -114,9 +114,9 @@ public class TeacherController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/teachers/{teacherId}/classes/{classId}", method=RequestMethod.POST) //adds existing teacher to group, NO BODY on POST
+	@RequestMapping(value="/teachers/{teacherId}/classes/{classId}", method=RequestMethod.POST)
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> assignTeacherToClass(@PathVariable String teacherId, @PathVariable String classId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+	public ResponseEntity<?> assignTeacherToClass(@PathVariable String teacherId, @PathVariable String classId) { 
 		Teacher teacher = teacherService.getTeacher(teacherId);
 		teacher.assignTeacherToClass(new Predavanje(classId, "",false));
 		teacherService.assignTeacherToClass(teacherId, teacher);
@@ -126,7 +126,20 @@ public class TeacherController {
 		predmetService.assignTeacherToClass(classId, predmet);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-
+	
+	@RequestMapping(value="/teachers/{teacherId}/classes/{classId}", method=RequestMethod.DELETE) 
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> removeTeacherFromClass(@PathVariable String teacherId, @PathVariable String classId) { //@RequestBody tells spring that the request pay load is going to contain a topics
+		Teacher teacher = teacherService.getTeacher(teacherId);
+		teacher.removeClass(new Predavanje(classId, "", false));
+		teacherService.removeClassFromTeacher(teacherId, teacher);
+		
+		Predavanje predmet = predmetService.getPredavanje(classId);
+		predmet.removeTeacher(new Teacher(teacherId, "", "", "", false));
+		predmetService.removeTeacherFromClass(classId, predmet);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
 	@RequestMapping(value="/teachers/{teacherId}", method=RequestMethod.PUT)
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> updateUser(@RequestBody Teacher teacher, @PathVariable String teacherId) { //@RequestBody tells spring that the request pay load is going to contain a user

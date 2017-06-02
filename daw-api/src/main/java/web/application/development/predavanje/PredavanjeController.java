@@ -181,11 +181,35 @@ public class PredavanjeController {
 	}
 	
 	@RequestMapping(value="/classes/listed/{pageNum}/{sizeNum}", method=RequestMethod.GET)
-	public HttpEntity<?> getCourse(@PathVariable int pageNum, @PathVariable int sizeNum) {
+	public HttpEntity<?> getClassesPaginated(@PathVariable int pageNum, @PathVariable int sizeNum) {
 		Page<Predavanje> pagePredavanje = predavanjeService.findAll(new PageRequest(pageNum, sizeNum));
 		if (pagePredavanje.getTotalPages() != 0) {
 			try {
 				List<Predavanje> predavanja = pagePredavanje.getContent();
+				JsonObject object = formatter.ReturnJSON(predavanja, new Predavanje());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String timeStamp = new ErrorLog().WriteErorLog(ex);
+		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value="/classes/listed/{pageNum}/{sizeNum}/descending", method=RequestMethod.GET)
+	public HttpEntity<?> getClassesPaginatedSortedBySemester(@PathVariable int pageNum, @PathVariable int sizeNum) {
+		Page<Predavanje> pagePredavanje = predavanjeService.findAll(new PageRequest(pageNum, sizeNum));
+		if (pagePredavanje.getTotalPages() != 0) {
+			try {
+				List<Predavanje> predavanja = new ArrayList<Predavanje>(pagePredavanje.getContent());
+				//List<Predavanje> predavanja = predavanjeService.getAllPredavanje();
+				Collections.sort(predavanja, descending(SEMESTER_SORT));
 				JsonObject object = formatter.ReturnJSON(predavanja, new Predavanje());
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);
