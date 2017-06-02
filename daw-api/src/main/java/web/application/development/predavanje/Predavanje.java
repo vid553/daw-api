@@ -104,6 +104,16 @@ public class Predavanje {	// Predavanje is a slovenian word for class ("turma")
 		}
 		this.teams.removeAll(teams);
 	}
+	
+	public void removeTeacher(Teacher teacher) {
+		List<Teacher> teachers = new ArrayList<Teacher>();
+		for (Teacher t : this.teachers) {
+			if (t.getId().equals(teacher.getId())) {
+				teachers.add(t);
+			}
+		}
+		this.teachers.removeAll(teachers);
+	}
 
 	public List<Student> getStudents() {
 		return students;
