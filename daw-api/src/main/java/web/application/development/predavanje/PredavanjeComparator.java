@@ -9,6 +9,11 @@ public enum PredavanjeComparator implements Comparator<Predavanje> {
 		return (s1.getIdentifier()).compareTo(s2.getIdentifier());
 	}},
 	
+	SEMESTER_SORT {
+	public int compare(Predavanje s1, Predavanje s2) {
+		return (s1.getSemester().getName()).compareTo(s2.getSemester().getName());
+	}},
+	
 	ID_SORT {
 	public int compare(Predavanje s1, Predavanje s2) {
 		return (s1.getId()).compareTo(s2.getId());
