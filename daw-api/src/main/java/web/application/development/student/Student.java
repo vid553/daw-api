@@ -83,6 +83,16 @@ public class Student {
 		}
 	}
 	
+	public void removeFromClass(Predavanje predavanje) {
+		List<Predavanje> klasses = new ArrayList<Predavanje>();
+		for(Predavanje c : this.predavanja){
+		    if(c.getId().equals(predavanje.getId())) {
+		    	klasses.add(c);
+		    }
+		}
+		this.predavanja.removeAll(klasses);
+	}
+	
 	@PreRemove
 	private void removePredavanjeFromStudent() {
 	    for (Predavanje p : this.predavanja) {
