@@ -163,6 +163,14 @@ public class Predavanje {	// Predavanje is a slovenian word for class ("turma")
 	        t.getPredavanja().remove(this);
 	    }
 	    
+	    if (this.teams != null ) {
+	    	for (Team t : this.teams) {
+	    		if(t.getPredavanje() == this) {
+	    			t.setPredavanje(null);
+	    		}
+	    	}
+	    }
+	    
 	    if (this.semester != null) {semester.getPredmeti().remove(this);}
 	    
 	    if (this.course != null) {course.getClasses().remove(this);}
