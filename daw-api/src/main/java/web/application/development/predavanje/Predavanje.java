@@ -122,7 +122,7 @@ public class Predavanje {	// Predavanje is a slovenian word for class ("turma")
 				students.add(t);
 			}
 		}
-		this.teachers.removeAll(students);
+		this.students.removeAll(students);
 	}
 
 	public List<Student> getStudents() {
