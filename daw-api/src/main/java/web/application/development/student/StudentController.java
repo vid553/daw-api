@@ -30,6 +30,8 @@ import web.application.development.formatter.Formatter;
 import web.application.development.headers.Headers;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
+import web.application.development.teacher.Teacher;
+
 import static web.application.development.student.StudentComparator.*;
 
 @RestController
@@ -166,6 +168,18 @@ public class StudentController {
 			}
 		}
 		
+	}
+	
+	@RequestMapping(value="/students/{id}/{classId}", method=RequestMethod.DELETE)
+	public ResponseEntity<?> removeStudentFromClass(@PathVariable String id, @PathVariable String classId) {
+		Student student = studentService.getStudent(id);
+		student.removeFromClass(new Predavanje(classId, "", false));
+		studentService.updateStudent(id, student);
+		
+		Predavanje predmet = predmetService.getPredavanje(classId);
+		predmet.removeStudent(new Student(id, "", "",""));
+		predmetService.updatePredavanje(classId, predmet);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@PreAuthorize("hasRole('ADMIN')")
