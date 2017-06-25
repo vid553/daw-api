@@ -139,7 +139,9 @@ public class Formatter {
 		
 		Predavanje predavanje = group.getPredavanje();
 		
-		groupEntity.addEntity(ReturnJSON(predavanje, new Team()));
+		if (predavanje != null) {
+			groupEntity.addEntity(ReturnJSON(predavanje, new Team()));
+		}
 		
 		groupEntity.addLink(URI.create(Uri), "self");
 		

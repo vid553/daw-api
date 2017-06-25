@@ -119,14 +119,21 @@ public class PredavanjeController {
 	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
 	public ResponseEntity<?> addTeamToPredavanje(@PathVariable String predavanjeId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
-		Predavanje predmet = predavanjeService.getPredavanje(predavanjeId);
-		predmet.addTeam(new Team(teamId,"",0));
-		predavanjeService.addTeamToPredavanje(predavanjeId, predmet);
-		
-		Team team = teamService.getGroup(teamId);
-		team.setPredavanje(predmet);
-		teamService.updateGroup(teamId, team);
-		return new ResponseEntity<>(HttpStatus.OK);
+		try {
+			Predavanje predmet = predavanjeService.getPredavanje(predavanjeId);
+			predmet.addTeam(new Team(teamId,"",0));
+			predavanjeService.addTeamToPredavanje(predavanjeId, predmet);
+			
+			Team team = teamService.getGroup(teamId);
+			team.setPredavanje(predmet);
+			teamService.updateGroup(teamId, team);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch (Exception ex) {
+			String timeStamp = new ErrorLog().WriteErorLog(ex);
+	        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
+	        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	//works
@@ -144,6 +151,10 @@ public class PredavanjeController {
 		Predavanje temp = predavanjeService.getPredavanje(predavanjeId);
 		temp.removeTeam(new Team(teamId, "", 0));
 		predavanjeService.removeTeamfromPredavanje(predavanjeId, temp);
+		
+		Team tempTeam = teamService.getGroup(teamId);
+		tempTeam.removeKlass(new Predavanje(predavanjeId, "", true));
+		teamService.updateGroup(teamId, tempTeam);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
