@@ -99,7 +99,7 @@ public class SemesterController {
 	}
 	
 	//works
-	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.POST)
+	@RequestMapping(value="/semesters/{semesterId}/{predmetId}", method=RequestMethod.POST)	// predmet je predavanje
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> addPredmetToSemester(@PathVariable String semesterId, @PathVariable String predmetId) { 
 		Semester semester = semesterService.getSemester(semesterId);
@@ -143,7 +143,7 @@ public class SemesterController {
 	}
 	
 	//sort parameters are NAME_SORT, ID_SORT, SEASON_SORT, LETO_SORT
-	@RequestMapping(value="/semsesters/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	@RequestMapping(value="/semesters/sort/descending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedSemestersDescending(@PathVariable List<String> sortParameter) {
 		List<Semester> semesters = semesterService.getAllSemesters();
 		
@@ -159,7 +159,7 @@ public class SemesterController {
 		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/semsesters/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
+	@RequestMapping(value="/semesters/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
 	public ResponseEntity<Entity> getSortedSemestersAscending(@PathVariable List<String> sortParameter) {
 		List<Semester> semesters = semesterService.getAllSemesters();
 		
