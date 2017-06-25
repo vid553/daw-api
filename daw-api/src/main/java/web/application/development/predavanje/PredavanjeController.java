@@ -9,10 +9,13 @@ import java.util.List;
 import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +27,9 @@ import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
 import web.application.development.exception.Error;
+import web.application.development.exception.ErrorLog;
 import web.application.development.formatter.Formatter;
+import web.application.development.headers.Headers;
 import web.application.development.team.Team;
 import web.application.development.team.TeamService;
 
@@ -38,6 +43,9 @@ public class PredavanjeController {
 	@Autowired
 	private Formatter formatter;
 	
+	private HttpHeaders sirenHeader = Headers.SirenHeader();
+	private HttpHeaders problemHeader = Headers.ProblemHeader();
+	
 	//works, if non-existing class -> returns 404
 	@RequestMapping(value="/classes", method=RequestMethod.GET) //maps URL /predmeti to method getAllPredmeti
 	public ResponseEntity<?> getAllPredmeti() {
@@ -50,23 +58,12 @@ public class PredavanjeController {
 				JsonObject object = formatter.ReturnJSON(predavanja, new Predavanje());
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);
-				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
-				String errorMessage = ex + "";
-				String[] errorsInfo = errorMessage.split(": ");
-				String detail;
-				if (errorsInfo.length > 1) {
-					detail = errorsInfo[1];
-				}
-				else {
-					detail = "No aditional information available.";
-				}
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
-		        HttpHeaders headers = new HttpHeaders();
-		        headers.add("Content-Type", "application/problem+json");
-		        headers.add("Content-Language", "en");
-		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+				String timeStamp = new ErrorLog().WriteErorLog(ex);
+		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 	}
@@ -80,23 +77,12 @@ public class PredavanjeController {
 				JsonObject object = formatter.ReturnJSON(predmet);
 				EntityReader entityReader = Siren.createEntityReader();
 				Entity entity = entityReader.read(object);
-				return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 			}
 			catch (Exception ex) {
-				String errorMessage = ex + "";
-				String[] errorsInfo = errorMessage.split(": ");
-				String detail;
-				if (errorsInfo.length > 1) {
-					detail = errorsInfo[1];
-				}
-				else {
-					detail = "No aditional information available.";
-				}
-		        Error error = new Error("about:blank", errorsInfo[0].substring(errorsInfo[0].lastIndexOf(".")+1), detail);
-		        HttpHeaders headers = new HttpHeaders();
-		        headers.add("Content-Type", "application/problem+json");
-		        headers.add("Content-Language", "en");
-		        return new ResponseEntity<Error>(error, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+				String timeStamp = new ErrorLog().WriteErorLog(ex);
+		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		
@@ -105,8 +91,10 @@ public class PredavanjeController {
 	
 	//doesnt work if uri contains special characters
 	@RequestMapping(value="/classes", method=RequestMethod.POST)
-	public void addPredavanje(@RequestBody Predavanje predmet) { //@RequestBody tells spring that the request pay load is going to contain a user
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> addPredavanje(@RequestBody Predavanje predmet) { //@RequestBody tells spring that the request pay load is going to contain a user
 		predavanjeService.addPredavanje(predmet);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	/*example of pay load
 	 * {
@@ -118,37 +106,56 @@ public class PredavanjeController {
 	
 	//works
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.PUT)
-	public void updatePredavanje(@RequestBody Predavanje predmet, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> updatePredavanje(@RequestBody Predavanje predmet, @PathVariable String id) { //@RequestBody tells spring that the request pay load is going to contain a user
 		Predavanje temp = predavanjeService.getPredavanje(id);
 		List<Team> teams = temp.getTeams();
 		predmet.setTeams(teams);
 		predavanjeService.updatePredavanje(id, predmet);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	//works
 	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.POST)
-	public void addTeamToPredavanje(@PathVariable String predavanjeId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
-		Predavanje predmet = predavanjeService.getPredavanje(predavanjeId);
-		predmet.addTeam(new Team(teamId,"",0));
-		predavanjeService.addTeamToPredavanje(predavanjeId, predmet);
-		
-		Team team = teamService.getGroup(teamId);
-		team.setPredavanje(predmet);
-		teamService.updateGroup(teamId, team);
+	@PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
+	public ResponseEntity<?> addTeamToPredavanje(@PathVariable String predavanjeId, @PathVariable String teamId) { //@RequestBody tells spring that the request pay load is going to contain a user
+		try {
+			Predavanje predmet = predavanjeService.getPredavanje(predavanjeId);
+			predmet.addTeam(new Team(teamId,"",0));
+			predavanjeService.addTeamToPredavanje(predavanjeId, predmet);
+			
+			Team team = teamService.getGroup(teamId);
+			team.setPredavanje(predmet);
+			teamService.updateGroup(teamId, team);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		catch (Exception ex) {
+			String timeStamp = new ErrorLog().WriteErorLog(ex);
+	        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
+	        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	//works
 	@RequestMapping(value="/classes/{id}", method=RequestMethod.DELETE)
-	public void deletePredmet(@PathVariable String id) {
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> deletePredmet(@PathVariable String id) {
 		predavanjeService.deletePredavanje(id);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//works
 	@RequestMapping(value="/classes/{predavanjeId}/{teamId}", method=RequestMethod.DELETE)
-	public void removeTeamFromPredmet(@PathVariable String predavanjeId, @PathVariable String teamId) {
+	@PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
+	public ResponseEntity<?> removeTeamFromPredmet(@PathVariable String predavanjeId, @PathVariable String teamId) {
 		Predavanje temp = predavanjeService.getPredavanje(predavanjeId);
 		temp.removeTeam(new Team(teamId, "", 0));
 		predavanjeService.removeTeamfromPredavanje(predavanjeId, temp);
+		
+		Team tempTeam = teamService.getGroup(teamId);
+		tempTeam.removeKlass(new Predavanje(predavanjeId, "", true));
+		teamService.updateGroup(teamId, tempTeam);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	//sort parameters are ID_SORT, IDENTIFIER_SORT
@@ -165,7 +172,7 @@ public class PredavanjeController {
 		JsonObject object = formatter.ReturnJSON(predavanja, new Predavanje());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/classes/sort/ascending/{sortParameter}", method=RequestMethod.GET) //maps URL /students to method getAllStudents
@@ -181,6 +188,52 @@ public class PredavanjeController {
 		JsonObject object = formatter.ReturnJSON(predavanja, new Predavanje());
 		EntityReader entityReader = Siren.createEntityReader();
 		Entity entity = entityReader.read(object);
-		return new ResponseEntity<Entity>(entity, HttpStatus.OK);
+		return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/classes/listed/{pageNum}/{sizeNum}", method=RequestMethod.GET)
+	public HttpEntity<?> getClassesPaginated(@PathVariable int pageNum, @PathVariable int sizeNum) {
+		Page<Predavanje> pagePredavanje = predavanjeService.findAll(new PageRequest(pageNum, sizeNum));
+		if (pagePredavanje.getTotalPages() != 0) {
+			try {
+				List<Predavanje> predavanja = pagePredavanje.getContent();
+				JsonObject object = formatter.ReturnJSON(predavanja, new Predavanje());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String timeStamp = new ErrorLog().WriteErorLog(ex);
+		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value="/classes/listed/{pageNum}/{sizeNum}/descending", method=RequestMethod.GET)
+	public HttpEntity<?> getClassesPaginatedSortedBySemester(@PathVariable int pageNum, @PathVariable int sizeNum) {
+		Page<Predavanje> pagePredavanje = predavanjeService.findAll(new PageRequest(pageNum, sizeNum));
+		if (pagePredavanje.getTotalPages() != 0) {
+			try {
+				List<Predavanje> predavanja = new ArrayList<Predavanje>(pagePredavanje.getContent());
+				//List<Predavanje> predavanja = predavanjeService.getAllPredavanje();
+				Collections.sort(predavanja, descending(SEMESTER_SORT));
+				JsonObject object = formatter.ReturnJSON(predavanja, new Predavanje());
+				EntityReader entityReader = Siren.createEntityReader();
+				Entity entity = entityReader.read(object);
+				return new ResponseEntity<Entity>(entity, sirenHeader, HttpStatus.OK);
+			}
+			catch (Exception ex) {
+				String timeStamp = new ErrorLog().WriteErorLog(ex);
+		        Error error = new Error("http://localhost:8080/error/server", "Internal server error", "Error ID: " + timeStamp);
+		        return new ResponseEntity<Error>(error, problemHeader, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 }

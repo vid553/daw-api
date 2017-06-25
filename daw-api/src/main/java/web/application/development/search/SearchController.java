@@ -1,7 +1,5 @@
 package web.application.development.search;
 
-import java.util.List;
-
 import javax.json.JsonObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +16,11 @@ import com.sebastian_daschner.siren4javaee.Entity;
 import com.sebastian_daschner.siren4javaee.EntityReader;
 import com.sebastian_daschner.siren4javaee.Siren;
 
-import web.application.develeopment.headers.Headers;
 import web.application.development.course.Course;
 import web.application.development.course.CourseService;
 import web.application.development.exception.Error;
 import web.application.development.formatter.Formatter;
+import web.application.development.headers.Headers;
 import web.application.development.predavanje.Predavanje;
 import web.application.development.predavanje.PredavanjeService;
 import web.application.development.semester.Semester;

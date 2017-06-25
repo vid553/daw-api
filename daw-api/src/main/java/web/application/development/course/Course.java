@@ -3,11 +3,15 @@ package web.application.development.course;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PreRemove;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import web.application.development.predavanje.Predavanje;
 import web.application.development.teacher.Teacher;
@@ -94,6 +98,14 @@ public class Course {
 	@PreRemove
 	private void removeTeacher() {
 	    
-	    this.teacher.getCourses().remove(this);
+	    if (this.teacher != null) {this.teacher.getCourses().remove(this);}
+	    
+	    if (this.classes != null ) {
+	    	for (Predavanje p : this.classes) {
+	    		if(p.getCourse() == this) {
+	    			p.setCourse(null);
+	    		}
+	    	}
+	    }
 	}
 }

@@ -8,6 +8,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.PreRemove;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import web.application.development.predavanje.Predavanje;
 
 @Entity 
@@ -78,6 +81,16 @@ public class Student {
 		if (!this.predavanja.contains(predavanje)) {
 			this.predavanja.add(predavanje);
 		}
+	}
+	
+	public void removeFromClass(Predavanje predavanje) {
+		List<Predavanje> klasses = new ArrayList<Predavanje>();
+		for(Predavanje c : this.predavanja){
+		    if(c.getId().equals(predavanje.getId())) {
+		    	klasses.add(c);
+		    }
+		}
+		this.predavanja.removeAll(klasses);
 	}
 	
 	@PreRemove

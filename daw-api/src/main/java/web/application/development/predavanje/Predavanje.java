@@ -7,6 +7,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PreRemove;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +23,7 @@ import web.application.development.teacher.Teacher;
 import web.application.development.team.Team;
 
 @Entity
-public class Predavanje {
+public class Predavanje {	// Predavanje is a slovenian word for class ("turma")
 
 	@Id	//primary key
 	private String id;
@@ -98,6 +104,26 @@ public class Predavanje {
 		}
 		this.teams.removeAll(teams);
 	}
+	
+	public void removeTeacher(Teacher teacher) {
+		List<Teacher> teachers = new ArrayList<Teacher>();
+		for (Teacher t : this.teachers) {
+			if (t.getId().equals(teacher.getId())) {
+				teachers.add(t);
+			}
+		}
+		this.teachers.removeAll(teachers);
+	}
+	
+	public void removeStudent(Student student) {
+		List<Student> students = new ArrayList<Student>();
+		for (Student t : this.students) {
+			if (t.getId().equals(student.getId())) {
+				students.add(t);
+			}
+		}
+		this.students.removeAll(students);
+	}
 
 	public List<Student> getStudents() {
 		return students;
@@ -137,9 +163,17 @@ public class Predavanje {
 	        t.getPredavanja().remove(this);
 	    }
 	    
-	    semester.getPredmeti().remove(this);
+	    if (this.teams != null ) {
+	    	for (Team t : this.teams) {
+	    		if(t.getPredavanje() == this) {
+	    			t.setPredavanje(null);
+	    		}
+	    	}
+	    }
 	    
-	    course.getClasses().remove(this);
+	    if (this.semester != null) {semester.getPredmeti().remove(this);}
+	    
+	    if (this.course != null) {course.getClasses().remove(this);}
 	}
 	
 	public Course getCourse() {
