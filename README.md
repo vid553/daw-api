@@ -2,9 +2,9 @@
 API Project (Web Application Development)
 
 Authors: Nejc Klemencic, Vid Rajtmajer, Miha Cerovsek
-Date: 20.4.2017
+Date: 25.6.2017
 
-Project version: 1.0
+Project version: 1.1
 _____________________________________________________________________________________________________________
 
 Description: 
