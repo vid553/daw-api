@@ -94,6 +94,10 @@ public class Team{
 		this.predavanje = predavanje;
 	}
 	
+	public void removeKlass(Predavanje klass) {
+		this.predavanje = null;
+	}
+	
 	@PreRemove
 	private void removeTeam() {
 	    
