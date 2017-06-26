@@ -209,7 +209,9 @@ public class Formatter {
 		}
 		
 		Teacher teacher = course.getTeacher();
-		courseEntity.addEntity(ReturnJSON(teacher, new Course()));
+		if (teacher != null) {
+			courseEntity.addEntity(ReturnJSON(teacher, new Course()));
+		}
 		
 		courseEntity.addLink(URI.create(Uri), "self");
 		return courseEntity.build();
